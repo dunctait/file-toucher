@@ -15,13 +15,13 @@ namespace file_toucher
     {
         struct TouchFiles
         {
-            public string filename { get; set; }
-            public string directory { get; set; }
-            public string fullpath { get; set; }
-            public string extension { get; set; }
-            public DateTime accessedOn { get; set; }
-            public DateTime modifiedOn { get; set; }
-            public DateTime createdOn { get; set; }
+            public string Filename { get; set; }
+            public string Directory { get; set; }
+            public string Fullpath { get; set; }
+            public string Extension { get; set; }
+            public DateTime AccessedOn { get; set; }
+            public DateTime ModifiedOn { get; set; }
+            public DateTime CreatedOn { get; set; }
         }
 
         ObservableCollection<TouchFiles> selectedFiles = new ObservableCollection<TouchFiles>();
@@ -29,7 +29,7 @@ namespace file_toucher
         public MainWindow()
         {
             // Use nicer Aero theme
-            Uri uri = new Uri("PresentationFramework.Aero;V3.0.0.0;31bf3856ad364e35;component\\themes/aero.normalcolor.xaml", UriKind.Relative);
+            var uri = new Uri("PresentationFramework.Aero;V3.0.0.0;31bf3856ad364e35;component\\themes/aero.normalcolor.xaml", UriKind.Relative);
             Resources.MergedDictionaries.Add(Application.LoadComponent(uri) as ResourceDictionary);
 
             InitializeComponent();
@@ -190,27 +190,18 @@ namespace file_toucher
         // Listener for when user requests to add a single file
         private void ButtonAddFile_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog dialog = new OpenFileDialog();
-
-            dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            dialog.Multiselect = true;
-
-            if (dialog.ShowDialog() == true)
+            var dialog = new OpenFileDialog
             {
-                string errorFiles = "";
-                int errors = 0;
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                Multiselect = true
+            };
 
-                foreach (string filename in dialog.FileNames)
-                {
-                    AddFile(filename);
-                    // if (certain errors) errorfiles += filename + "\n";
-                    // errors++;
-                }
 
-                if (errors > 0) {
-                    Xceed.Wpf.Toolkit.MessageBox.Show(this, string.Format("The following files couldn't be added:\n{0}", errorFiles),
-                        "Error adding certain files");
-                }
+            if (dialog.ShowDialog() != true) return;
+
+            foreach (string filename in dialog.FileNames)
+            {
+                AddFile(filename);
             }
 
         }
@@ -219,22 +210,21 @@ namespace file_toucher
         private void ButtonAddDirectory_Click(object sender, RoutedEventArgs e)
         {
 
-            VistaFolderBrowserDialog dialog = new VistaFolderBrowserDialog();
-            dialog.Description = "Please select a folder.";
-            dialog.UseDescriptionForTitle = true; // This applies to the Vista style dialog only, not the old dialog.
-            if (!VistaFolderBrowserDialog.IsVistaFolderDialogSupported)
-                Xceed.Wpf.Toolkit.MessageBox.Show(this, "Because you are not using Windows Vista or later, the regular folder browser dialog will be used. Please use Windows Vista or later to see the new dialog.", "Sample folder browser dialog");
-                // put in old dialog style
+            var dialog = new VistaFolderBrowserDialog
+            {
+                Description = "Please select a folder.",
+                UseDescriptionForTitle = true
+            };
 
             object showDialog = dialog.ShowDialog(this);
             if (showDialog != null && (bool) showDialog)
             {
 
                 //Xceed.Wpf.Toolkit.MessageBox.Show(this, "The selected folder was: " + dialog.SelectedPath, "Sample folder browser dialog");
-                String[] allfiles = System.IO.Directory.GetFiles(dialog.SelectedPath, "*.*",
+                string[] allfiles = System.IO.Directory.GetFiles(dialog.SelectedPath, "*.*",
                     System.IO.SearchOption.AllDirectories);
 
-                foreach (string foundFiles in allfiles)
+                foreach (var foundFiles in allfiles)
                 {
                     AddFile(foundFiles);
                 }
@@ -244,22 +234,32 @@ namespace file_toucher
         private void AddFile(string path)
         {
             // Check if file is already in list
-            if (selectedFiles.Any(t => path == t.fullpath))
+            if (selectedFiles.Any(t => path == t.Fullpath))
             {
                 return;
             }
 
-            TouchFiles toAdd = new TouchFiles();
-            toAdd.accessedOn = File.GetLastAccessTime(path);
-            toAdd.modifiedOn = File.GetLastWriteTime(path);
-            toAdd.createdOn = File.GetCreationTime(path);
+            try
+            {
+                var toAdd = new TouchFiles
+                {
+                    AccessedOn = File.GetLastAccessTime(path),
+                    ModifiedOn = File.GetLastWriteTime(path),
+                    CreatedOn = File.GetCreationTime(path),
+                    Filename = Path.GetFileName(path),
+                    Directory = Path.GetDirectoryName(path),
+                    Extension = Path.GetExtension(path),
+                    Fullpath = path
+                };
 
-            toAdd.filename = Path.GetFileName(path);
-            toAdd.directory = Path.GetDirectoryName(path);
-            toAdd.extension = Path.GetExtension(path);
-            toAdd.fullpath = path;
-
-            selectedFiles.Add(toAdd);
+                selectedFiles.Add(toAdd);
+            }
+            catch (Exception errorException)
+            {
+                var fileError = "Error adding file " + path + "\n" + errorException.ToString().Split('\n')[0];
+                Xceed.Wpf.Toolkit.MessageBox.Show(fileError, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            
         }
 
         // Bind DataGrid so that it automatically updates when files are added to the ObservableCollection
@@ -276,7 +276,7 @@ namespace file_toucher
                 CheckboxCreated.IsChecked == false)
             {
                 // Touch button clicked but no time is set to touch with. Show error
-                MessageBoxResult result = Xceed.Wpf.Toolkit.MessageBox.Show("You must select a time before touching.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Xceed.Wpf.Toolkit.MessageBox.Show("You must select a time before touching.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -323,13 +323,13 @@ namespace file_toucher
                 {
                     try
                     {
-                        File.SetLastAccessTime(files.fullpath, touchAccessed);
+                        File.SetLastAccessTime(files.Fullpath, touchAccessed);
                         anyTouches = true;
                     }
                     catch (Exception errorException)
                     {
 
-                        erroredFiles += "Error: " + files.fullpath + " - " + errorException.ToString().Split('\n')[0] + "\n";
+                        erroredFiles += "Error: " + files.Fullpath + " - " + errorException.ToString().Split('\n')[0] + "\n";
                         anyErrors = true;
                     }
                 }
@@ -338,12 +338,12 @@ namespace file_toucher
                 {
                     try
                     {
-                        File.SetLastWriteTime(files.fullpath, touchModified);
+                        File.SetLastWriteTime(files.Fullpath, touchModified);
                         anyTouches = true;
                     }
                     catch (Exception errorException)
                     {
-                        erroredFiles += "Error: " + files.fullpath + " - " + errorException.ToString().Split('\n')[0] + "\n";
+                        erroredFiles += "Error: " + files.Fullpath + " - " + errorException.ToString().Split('\n')[0] + "\n";
                         anyErrors = true;
                     }
                 }
@@ -352,12 +352,12 @@ namespace file_toucher
                 {
                     try
                     {
-                        File.SetCreationTime(files.fullpath, touchCreated);
+                        File.SetCreationTime(files.Fullpath, touchCreated);
                         anyTouches = true;
                     }
                     catch (Exception errorException)
                     {
-                        erroredFiles += "Error: " + files.fullpath + " - " + errorException.ToString().Split('\n')[0] + "\n";
+                        erroredFiles += "Error: " + files.Fullpath + " - " + errorException.ToString().Split('\n')[0] + "\n";
                         anyErrors = true;
                     }
                 }
@@ -375,21 +375,21 @@ namespace file_toucher
                 stringToShow += "\n\n" + erroredFiles;
             }
 
-            MessageBoxResult touchResultMessageBox = Xceed.Wpf.Toolkit.MessageBox.Show(stringToShow, "Touch Results", MessageBoxButton.OK, MessageBoxImage.Information);
+            Xceed.Wpf.Toolkit.MessageBox.Show(stringToShow, "Touch Results", MessageBoxButton.OK, MessageBoxImage.Information);
 
-            refreshFileDatestamps();
+            RefreshFileDatestamps();
 
         }
 
         // After touch function is carried out, file information needs updated so changes show in the DataGrid
-        private void refreshFileDatestamps()
+        private void RefreshFileDatestamps()
         {
             for (var i = 0; i<selectedFiles.Count; i++)
             {
                 TouchFiles tempFile = selectedFiles[i];
-                tempFile.accessedOn = File.GetLastAccessTime(tempFile.fullpath);
-                tempFile.modifiedOn = File.GetLastWriteTime(tempFile.fullpath);
-                tempFile.createdOn = File.GetCreationTime(tempFile.fullpath);
+                tempFile.AccessedOn = File.GetLastAccessTime(tempFile.Fullpath);
+                tempFile.ModifiedOn = File.GetLastWriteTime(tempFile.Fullpath);
+                tempFile.CreatedOn = File.GetCreationTime(tempFile.Fullpath);
 
                 selectedFiles[i] = tempFile;
             }
@@ -408,7 +408,7 @@ namespace file_toucher
             foreach (TouchFiles item in FilesDataGrid.SelectedItems) // for each of the files selected in the window
             {
                 // add any files with a matching path to selected files in the toBeRemoved pile
-                toBeRemoved.Add(selectedFiles.SingleOrDefault(i => i.fullpath == item.fullpath));
+                toBeRemoved.Add(selectedFiles.SingleOrDefault(i => i.Fullpath == item.Fullpath));
             }
 
             // iterate through all items to be removed and remove them
