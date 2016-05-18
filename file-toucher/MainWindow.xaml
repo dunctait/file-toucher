@@ -3,10 +3,92 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:file_toucher"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="http://schemas.AvalonControls/AvalonControlsLibrary/Controls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+        Title="file-toucher 0.1" BorderThickness="0" Height="400" Width="800" MinHeight="400" MinWidth="600">
+
+    <DockPanel>
+
+        <Menu x:Name="menu" DockPanel.Dock="Top" Height="Auto" BorderBrush="#aaaaaa" BorderThickness="0,0,0,1" VerticalAlignment="Top">
+            <MenuItem Header="_File" Padding="6,2,6,2">
+                <MenuItem x:Name="MenuItem_Exit" Header="_Exit" Click="MenuItem_Exit_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem x:Name="MenuItem_About" Header="_About" Click="MenuItem_About_Click"/>
+            </MenuItem>
+        </Menu>
+
+        <StatusBar DockPanel.Dock="Bottom" BorderThickness="0,1,0,0" BorderBrush="#aaaaaa" HorizontalAlignment="Stretch">
+            <StatusBarItem>
+                <TextBlock Name="StatusBarText" Text="Program started" />
+            </StatusBarItem>
+        </StatusBar>
+
+        <Grid DockPanel.Dock="Bottom" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" MinHeight="70" Margin="10,5,10,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+
+            <CheckBox x:Name="CheckboxAccessed" Tag="0"  Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="4" Checked="AttributeChecked" Unchecked="AttributeUnchecked"/>
+            <CheckBox x:Name="CheckboxModified" Tag="1" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="4"  Checked="AttributeChecked" Unchecked="AttributeUnchecked"/>
+            <CheckBox x:Name="CheckboxCreated" Tag="2" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="4"  Checked="AttributeChecked" Unchecked="AttributeUnchecked"/>
+
+            <Label Grid.Row="0" Grid.Column="1" Content="Attributes to set" FontWeight="Bold"  VerticalAlignment="Center" Padding="0" Margin="0,5,15,0"/>
+            <Label Grid.Row="1" Grid.Column="1" Content="Last Accessed On"  VerticalAlignment="Center" Padding="0" Margin="0,0,5,0"/>
+            <Label Grid.Row="2" Grid.Column="1" Content="Last Modified On"  VerticalAlignment="Center" Padding="0" Margin="0,0,5,0"/>
+            <Label Grid.Row="3" Grid.Column="1" Content="Created On"  VerticalAlignment="Center" Padding="0" Margin="0,0,5,0"/>
+
+            <Label Grid.Row="0" Grid.Column="2" Content="Date and Time to set" FontWeight="Bold" VerticalAlignment="Center" Padding="0" Margin="5,5,0,0"/>
+
+            <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <xctk:DateTimePicker x:Name="AccessedDate" MinWidth="200" VerticalAlignment="Center" Margin="4"/>
+                <CheckBox x:Name="CheckboxAccessedNow" Tag="0" Content="Current Time" VerticalAlignment="Center" Margin="4,4,2,4" Checked="CurrentTimeChecked" Unchecked="CurrentTimeUnchecked"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <xctk:DateTimePicker x:Name="ModifiedDate" MinWidth="200" VerticalAlignment="Center" Margin="4"/>
+                <CheckBox x:Name="CheckboxModifiedNow" Tag="1" Content="Current Time" VerticalAlignment="Center" Margin="4,4,2,4" Checked="CurrentTimeChecked" Unchecked="CurrentTimeUnchecked"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="3" Grid.Column="2" Orientation="Horizontal" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <xctk:DateTimePicker x:Name="CreatedDate" Tag="2" MinWidth="200" VerticalAlignment="Center" Margin="4"/>
+                <CheckBox x:Name="CheckboxCreatedNow" Tag="2" Content="Current Time" VerticalAlignment="Center" Margin="4,4,2,4" Checked="CurrentTimeChecked" Unchecked="CurrentTimeUnchecked"/>
+            </StackPanel>
+
+
+
+            <Button x:Name="ButtonTouch" Grid.Row="0" Grid.Column="3" Grid.RowSpan="4" Margin="15,5,0,0" Padding="3" FontSize="16" Click="ButtonTouch_Click">Touch Files</Button>
+
+        </Grid>
+
+        <StackPanel Height="Auto" DockPanel.Dock="Right" VerticalAlignment="Stretch" MinWidth="150">
+            <Button x:Name="ButtonAddFile" Margin="5,10,10,5" Padding="3" Click="ButtonAddFile_Click">Add Files</Button>
+            <Button x:Name="ButtonAddDirectory" Margin="5,5,10,5" Padding="3" Click="ButtonAddDirectory_Click">Add Directory</Button>
+            <Button x:Name="ButtonRemove" Margin="5,15,10,5" Padding="3" Click="ButtonRemove_Click">Remove Selected</Button>
+            <Button x:Name="ButtonClear" Margin="5,5,10,5" Padding="3" Click="ButtonClear_Click">Clear All</Button>
+        </StackPanel>
+
+        <DataGrid x:Name="FilesDataGrid" DockPanel.Dock="Left" VerticalAlignment="Stretch" AutoGenerateColumns="false" IsReadOnly="true" Margin="10,10,0,0" Padding="0">
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="cFilename" Binding="{Binding filename}" Header="Filename" />
+                <DataGridTextColumn x:Name="cDirectory" Binding="{Binding directory}" Header="Directory" />
+                <DataGridTextColumn x:Name="cAccessedOn" Binding="{Binding accessedOn}" Header="Accessed On" />
+                <DataGridTextColumn x:Name="cModifiedOn" Binding="{Binding modifiedOn}" Header="Modified On" />
+                <DataGridTextColumn x:Name="cCreatedOn" Binding="{Binding createdOn}" Header="Created On" />
+                <DataGridTextColumn x:Name="cExtension" Binding="{Binding extension}" Header="File Extension" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+    </DockPanel>
 </Window>
