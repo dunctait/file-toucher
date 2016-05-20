@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "file-toucher", "file-toucher\file-toucher.csproj", "{6F382571-13F2-4288-9CDF-12E413920AAF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileToucher", "FileToucher\FileToucher.csproj", "{E1BB8A7F-0DAC-4317-AA31-FE7FE01670FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6F382571-13F2-4288-9CDF-12E413920AAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6F382571-13F2-4288-9CDF-12E413920AAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6F382571-13F2-4288-9CDF-12E413920AAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6F382571-13F2-4288-9CDF-12E413920AAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1BB8A7F-0DAC-4317-AA31-FE7FE01670FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1BB8A7F-0DAC-4317-AA31-FE7FE01670FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1BB8A7F-0DAC-4317-AA31-FE7FE01670FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1BB8A7F-0DAC-4317-AA31-FE7FE01670FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

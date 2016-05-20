@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace file_toucher.Properties
+namespace FileToucher.Properties
 {
 
 

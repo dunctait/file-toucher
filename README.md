@@ -4,6 +4,12 @@ File toucher is an application to update the various timestamps on files in a Wi
 
 The original purpose of the application was/is to convince the Google Music application to re-upload music, though it can't be guaranteed that Google Musics approach will continue to use these flags. Also, the Google Music app seems to be extremely fickle, if not totally unpredictable. 
 
+# Code Structure
+
+Version 0.2 involved a full rewrite to implement the MVVM approach with a few caveats in that the View Model also functions as the model and there are a few calls from the ViewModel to open dialogs/message boxes.
+
+It is fair to say that MVVM is over-engineering for an application as small as this but the real function of this program is essentially to familiarise myself with larger scale design practices.
+
 # To do
 
 When refreshing timestamps after touching any FileNotFound files show a date of 1601. Highlight errored files and show no date.
@@ -17,6 +23,10 @@ Add progress windows (with Cancel function) and some sort of threading in case p
 Add option to save file list that can be imported later to save people finding and adding files again.
 
 Automatically save last date time options (to registry?).
+
+Save last folder that files were added from
+
+Add language selection
 
 # Acknowledgements
 
