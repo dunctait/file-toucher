@@ -606,7 +606,7 @@ namespace FileToucher
         /// </summary>
         public void ShowAbout()
         {    
-            Xceed.Wpf.Toolkit.MessageBox.Show("file-toucher 0.1 created by Duncan Tait.\nGithub repository: https://github.com/dunctait/file-toucher", "About file-toucher", MessageBoxButton.OK, MessageBoxImage.Information);
+            Xceed.Wpf.Toolkit.MessageBox.Show("file-toucher 0.2 created by Duncan Tait.\nGithub repository: https://github.com/dunctait/file-toucher", "About file-toucher", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
     }
