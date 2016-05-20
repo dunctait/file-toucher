@@ -84,7 +84,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="CustomDataGrid.cs" />
-    <Compile Include="FileToucherLogic.cs" />
     <Compile Include="FileToucherViewModel.cs" />
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="TouchFiles.cs" />

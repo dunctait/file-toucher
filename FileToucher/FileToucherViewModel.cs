@@ -327,6 +327,9 @@ namespace FileToucher
 
         }
 
+        /// <summary>
+        /// Creates folder browser dialog, passes each file in folder and subfolder to AddFile()
+        /// </summary>
         public void AddDirectory()
         {
             var dialog = new VistaFolderBrowserDialog

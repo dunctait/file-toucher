@@ -4,6 +4,8 @@ File toucher is an application to update the various timestamps on files in a Wi
 
 The original purpose of the application was/is to convince the Google Music application to re-upload music, though it can't be guaranteed that Google Musics approach will continue to use these flags. Also, the Google Music app seems to be extremely fickle, if not totally unpredictable. 
 
+![Screenshot of v0.2](https://raw.githubusercontent.com/dunctait/file-toucher/master/Screenshot.png)
+
 # Code Structure
 
 Version 0.2 involved a full rewrite to implement the MVVM approach with a few caveats in that the View Model also functions as the model and there are a few calls from the ViewModel to open dialogs/message boxes.
