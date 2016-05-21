@@ -339,33 +339,33 @@ namespace FileToucher
             };
 
             object showDialog = dialog.ShowDialog();
-            if (showDialog != null && (bool)showDialog)
+
+            if (showDialog == null || !(bool) showDialog) return;
+
+            string[] allfiles = Directory.GetFiles(dialog.SelectedPath, "*.*",
+                SearchOption.AllDirectories);
+
+            var successfulAdds = 0;
+
+            foreach (var foundFiles in allfiles)
             {
-                string[] allfiles = System.IO.Directory.GetFiles(dialog.SelectedPath, "*.*",
-                    System.IO.SearchOption.AllDirectories);
-
-                var successfulAdds = 0;
-
-                foreach (var foundFiles in allfiles)
+                if (AddFile(foundFiles))
                 {
-                    if (AddFile(foundFiles))
-                    {
-                        successfulAdds++;
-                    };
+                    successfulAdds++;
                 }
+            }
 
-                switch (successfulAdds)
-                {
-                    case 0:
-                        StatusBarText = "No files were added to list.";
-                        break;
-                    case 1:
-                        StatusBarText = "1 file added to list.";
-                        break;
-                    default:
-                        StatusBarText = successfulAdds.ToString() + " files added to list.";
-                        break;
-                }
+            switch (successfulAdds)
+            {
+                case 0:
+                    StatusBarText = "No files were added to list.";
+                    break;
+                case 1:
+                    StatusBarText = "1 file added to list.";
+                    break;
+                default:
+                    StatusBarText = successfulAdds.ToString() + " files added to list.";
+                    break;
             }
         }
 
@@ -478,7 +478,7 @@ namespace FileToucher
                 {
                     touchAccessedTime = DateTime.Parse(_attributeDateTimes[0]);
                 }
-                catch (Exception errorException)
+                catch
                 {
                     Xceed.Wpf.Toolkit.MessageBox.Show("Unable to read specified Accessed On date and time, make sure it is typed correctly", "Error Parsing Date", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
@@ -492,7 +492,7 @@ namespace FileToucher
                 {
                     touchModifiedTime = DateTime.Parse(_attributeDateTimes[1]);
                 }
-                catch (Exception errorException)
+                catch
                 {
                     Xceed.Wpf.Toolkit.MessageBox.Show("Unable to read specified Modified On date and time, make sure it is typed correctly", "Error Parsing Date", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
@@ -506,7 +506,7 @@ namespace FileToucher
                 {
                     touchCreatedTime = DateTime.Parse(_attributeDateTimes[2]);
                 }
-                catch (Exception errorException)
+                catch
                 {
                     Xceed.Wpf.Toolkit.MessageBox.Show("Unable to read specified Created On date and time, make sure it is typed correctly", "Error Parsing Date", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
@@ -609,7 +609,7 @@ namespace FileToucher
         /// </summary>
         public void ShowAbout()
         {    
-            Xceed.Wpf.Toolkit.MessageBox.Show("file-toucher 0.2 created by Duncan Tait.\nGithub repository: https://github.com/dunctait/file-toucher", "About file-toucher", MessageBoxButton.OK, MessageBoxImage.Information);
+            Xceed.Wpf.Toolkit.MessageBox.Show("Tile Toucher 0.2 created by Duncan Tait.\nGithub repository: https://github.com/dunctait/file-toucher", "About file-toucher", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
     }
