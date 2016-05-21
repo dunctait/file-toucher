@@ -90,11 +90,52 @@
             <local:CustomDataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Filename}" Header="Filename" />
                 <DataGridTextColumn Binding="{Binding Directory}" Header="Directory" />
-                <DataGridTextColumn Binding="{Binding AccessedOn}" Header="Accessed On" />
-                <DataGridTextColumn Binding="{Binding ModifiedOn}" Header="Modified On" />
-                <DataGridTextColumn Binding="{Binding CreatedOn}" Header="Created On" />
+                <DataGridTextColumn Binding="{Binding AccessedOn}" Header="Accessed On">
+                    <DataGridTextColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Error}" Value="True">
+                                    <Setter Property="Foreground" Value="#FFBBBB"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding ModifiedOn}" Header="Modified On">
+                    <DataGridTextColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Error}" Value="True">
+                                    <Setter Property="Foreground" Value="#FFBBBB"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding CreatedOn}" Header="Created On">
+                    <DataGridTextColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Error}" Value="True">
+                                    <Setter Property="Foreground" Value="#FFBBBB"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
                 <DataGridTextColumn Binding="{Binding Extension}" Header="File Extension" />
                 </local:CustomDataGrid.Columns>
+            <local:CustomDataGrid.Resources>
+                <Style TargetType="{x:Type DataGridRow}" >
+                    <Setter Property="Background" Value="White"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Error}" Value="True">
+                            <Setter Property="Background" Value="#FFBBBB"/>
+                            <Setter Property="ToolTip" Value="Error: File not found/accessible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </local:CustomDataGrid.Resources>
         </local:CustomDataGrid>
 
     </DockPanel>

@@ -8,6 +8,7 @@ using Microsoft.Win32;
 using System.Linq;
 using System.IO;
 using System.Windows;
+using System.Windows.Media.Animation;
 using Ookii.Dialogs.Wpf;
 
 namespace FileToucher
@@ -342,18 +343,7 @@ namespace FileToucher
 
             if (showDialog == null || !(bool) showDialog) return;
 
-            string[] allfiles = Directory.GetFiles(dialog.SelectedPath, "*.*",
-                SearchOption.AllDirectories);
-
-            var successfulAdds = 0;
-
-            foreach (var foundFiles in allfiles)
-            {
-                if (AddFile(foundFiles))
-                {
-                    successfulAdds++;
-                }
-            }
+            var successfulAdds = RecursiveFolderSearch(dialog.SelectedPath, 0);
 
             switch (successfulAdds)
             {
@@ -367,6 +357,28 @@ namespace FileToucher
                     StatusBarText = successfulAdds.ToString() + " files added to list.";
                     break;
             }
+        }
+
+        private int RecursiveFolderSearch(string path, int totalAddedSoFar)
+        {
+            var totalAdded = totalAddedSoFar;
+
+            foreach (string file in Directory.GetFiles(path))
+            {
+                if (AddFile(file)) { totalAdded++; };
+            }
+            foreach (string subDir in Directory.GetDirectories(path))
+            {
+                try
+                {
+                    totalAdded += RecursiveFolderSearch(subDir, 0);
+                }
+                catch
+                {
+                    // swallow, log, whatever
+                }
+            }
+            return totalAdded;
         }
 
         /// <summary>
@@ -517,6 +529,10 @@ namespace FileToucher
 
             foreach (TouchFiles files in _selectedFiles)
             {
+
+                // Check to see if file already has been deemed FileNotFound etc, if so don't touch it
+                if (files.Error) { continue; }
+
                 var anyTouches = false;
 
                 if (AccessedCheck)

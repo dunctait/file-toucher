@@ -40,6 +40,22 @@ namespace FileToucher
             {
                 _createdOn = value;
                 RaisePropertyChangedEvent("CreatedOn");
+
+                if (_createdOn.Year == 1601)
+                {
+                    RaisePropertyChangedEvent("Error");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the CreatedOn date is 1601, since that implies FileNotFound
+        /// </summary>
+        public bool Error
+        {
+            get
+            {
+                return (AccessedOn.Year == 1601);
             }
         }
 
