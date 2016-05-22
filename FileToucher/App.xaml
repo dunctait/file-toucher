@@ -1,9 +1,4 @@
-﻿<Application x:Class="FileToucher.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:FileToucher"
-             StartupUri="FileToucherView.xaml">
-    <Application.Resources>
-         
-    </Application.Resources>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application xmlns:local="clr-namespace:FileToucher" StartupUri="FileToucherView.xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+    
 </Application>

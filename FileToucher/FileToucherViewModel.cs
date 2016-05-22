@@ -375,7 +375,7 @@ namespace FileToucher
                 }
                 catch
                 {
-                    // swallow, log, whatever
+                    // ignore files/folders that can't be accessed
                 }
             }
             return totalAdded;
