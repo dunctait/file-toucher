@@ -6,7 +6,8 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:FileToucher"
         mc:Ignorable="d"
-        Title="File Toucher 0.2" BorderThickness="0" Height="400" Width="800" MinHeight="400" MinWidth="750">
+        Name="win"
+        Title="File Toucher 0.2" WindowStyle="None" AllowsTransparency="True" WindowStartupLocation="CenterScreen" Style="{StaticResource WindowStyle}" Height="400" Width="800" MinHeight="400" MinWidth="750" SourceInitialized="Window_SourceInitialized">
 
     <Window.DataContext>
         <local:FileToucherViewModel/>
@@ -15,17 +16,37 @@
 
     <DockPanel>
 
-        <Menu x:Name="Menu" DockPanel.Dock="Top" Height="Auto" BorderBrush="#aaaaaa" BorderThickness="0,0,0,1" VerticalAlignment="Top">
-            <MenuItem Header="_File" Padding="6,2,6,2">
-                <MenuItem x:Name="MenuItemExit" Header="_Exit" Command="{Binding ExitClicked}"/>
+        <Grid DockPanel.Dock="Top" Style="{StaticResource GridStyle}" MouseLeftButtonDown="TitleBarMouseLeftButtonDown" MouseLeftButtonUp="TitleBarMouseLeftButtonUp" MouseMove="TitleBarMouseMove">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            
+            <Label Grid.Row="0" Grid.Column="0"  Content="File Toucher 0.2" Style="{StaticResource TitleBarLabelStyle}"></Label>
+
+            <Button Grid.Row="0" Grid.Column="2"  Content="Minimize" Click="MinimizeButton_Click"/>
+            <Button Grid.Row="0" Grid.Column="3"  Content="Restore" Click="RestoreButton_Click"/>
+            <Button Grid.Row="0" Grid.Column="4"  Content="Close" Command="{Binding ExitClicked}"/>
+            
+        </Grid>
+        
+        <Menu Style="{StaticResource MenuStyle}" DockPanel.Dock="Top" Height="Auto" BorderBrush="#aaaaaa" BorderThickness="0,0,0,1" VerticalAlignment="Top">
+            <MenuItem Style="{StaticResource MenuItemStyle}" Header="_File">
+                <MenuItem Header="_Exit" Style="{StaticResource MenuItemStyle}" Command="{Binding ExitClicked}"/>
             </MenuItem>
-            <MenuItem Header="_Help">
-                <MenuItem x:Name="MenuItemAbout" Header="_About" Command="{Binding AboutClicked}"/>
+            <MenuItem Style="{StaticResource MenuItemStyle}" Header="_Help">
+                <MenuItem Header="_About" Style="{StaticResource MenuItemStyle}" Command="{Binding AboutClicked}"/>
             </MenuItem>
         </Menu>
 
-        <StatusBar DockPanel.Dock="Bottom" BorderThickness="0,1,0,0" BorderBrush="#aaaaaa" HorizontalAlignment="Stretch">
-            <StatusBarItem>
+        <StatusBar Style="{StaticResource StatusBarStyle}" DockPanel.Dock="Bottom" HorizontalAlignment="Stretch">
+            <StatusBarItem Style="{StaticResource StatusBarItemStyle}">
                 <TextBlock Name="StatusBarText" Text="{Binding StatusBarText}" />
             </StatusBarItem>
         </StatusBar>
@@ -47,9 +68,9 @@
             </Grid.ColumnDefinitions>
 
 
-            <CheckBox x:Name="CheckboxAccessed" IsChecked="{Binding Path=AccessedCheck, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="4"/>
-            <CheckBox x:Name="CheckboxModified" IsChecked="{Binding Path=ModifiedCheck, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="4"/>
-            <CheckBox x:Name="CheckboxCreated" IsChecked="{Binding Path=CreatedCheck, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Margin="4"/>
+            <CheckBox IsChecked="{Binding Path=AccessedCheck, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="4"/>
+            <CheckBox IsChecked="{Binding Path=ModifiedCheck, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="4"/>
+            <CheckBox IsChecked="{Binding Path=CreatedCheck, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Margin="4"/>
 
             <Label Grid.Row="0" Grid.Column="2" Content="Attributes to set" FontWeight="Bold"  VerticalAlignment="Center" Padding="0" Margin="0,5,15,0"/>
             <Label Grid.Row="1" Grid.Column="2" Content="Last Accessed On"  VerticalAlignment="Center" Padding="0" Margin="0,0,5,0"/>
@@ -75,15 +96,15 @@
 
 
 
-            <Button x:Name="ButtonTouch" Grid.Row="0" Grid.Column="4" Grid.RowSpan="4" Width="200" Margin="15,5,0,0" Padding="3" FontSize="16" Command="{Binding TouchFilesClicked}">Touch Files</Button>
+            <Button Style="{StaticResource ButtonStyle}" Grid.Row="0" Grid.Column="4" Grid.RowSpan="4" Width="200" Margin="15,5,0,0" Padding="3" FontSize="16" Command="{Binding TouchFilesClicked}">Touch Files</Button>
 
         </Grid>
 
         <StackPanel Height="Auto" DockPanel.Dock="Right" VerticalAlignment="Stretch" MinWidth="150">
-            <Button x:Name="ButtonAddFile" Margin="5,10,10,5" Padding="3" Command="{Binding AddFilesClicked}">Add Files</Button>
-            <Button x:Name="ButtonAddDirectory" Margin="5,5,10,5" Padding="3" Command="{Binding AddDirectoryClicked}">Add Directory</Button>
-            <Button x:Name="ButtonRemove" Margin="5,15,10,5" Padding="3" Command="{Binding RemoveSelectedClicked}">Remove Selected</Button>
-            <Button x:Name="ButtonRemoveAll" Margin="5,5,10,5" Padding="3" Command="{Binding RemoveAllClicked}">Remove All</Button>
+            <Button Margin="5,10,10,5" Style="{StaticResource ButtonStyle}" Command="{Binding AddFilesClicked}">Add Files</Button>
+            <Button Margin="5,5,10,5" Style="{StaticResource ButtonStyle}" Command="{Binding AddDirectoryClicked}">Add Directory</Button>
+            <Button Margin="5,15,10,5" Style="{StaticResource ButtonStyle}" Command="{Binding RemoveSelectedClicked}">Remove Selected</Button>
+            <Button Margin="5,5,10,5" Style="{StaticResource ButtonStyle}" Command="{Binding RemoveAllClicked}">Remove All</Button>
         </StackPanel>
 
         <local:CustomDataGrid x:Name="FilesDataGrid" ItemsSource="{Binding SelectedTouchFiles, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Left" SelectedItemsList="{Binding SelectedRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Stretch" AutoGenerateColumns="false" IsReadOnly="true" Margin="10,10,0,0" Padding="0">
