@@ -18,7 +18,7 @@ It is fair to say that MVVM is over-engineering for an application as small as t
 
 Implement dialogs using the MVVM approach, then implement more information dialogs (i.e "4 files were successfully touched" etc)
 
-Style the app in some way.
+Style dialogs
 
 Add an "Add Directory with File Mask" function, or at least by file extension.
 
