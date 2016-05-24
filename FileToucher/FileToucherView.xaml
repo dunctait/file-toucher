@@ -6,8 +6,14 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:FileToucher"
         mc:Ignorable="d"
-        Name="win"
-        Title="File Toucher 0.2" WindowStyle="None" AllowsTransparency="True" WindowStartupLocation="CenterScreen" Style="{StaticResource WindowStyle}" Height="400" Width="800" MinHeight="400" MinWidth="750" SourceInitialized="Window_SourceInitialized">
+        Name="Win"
+        Title="File Toucher 0.2" WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" Style="{StaticResource WindowStyle}" Height="400" Width="800" MinHeight="400" MinWidth="750" SourceInitialized="Window_SourceInitialized">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome 
+        CaptionHeight="5"
+        ResizeBorderThickness="5" />
+    </WindowChrome.WindowChrome>
 
     <Window.DataContext>
         <local:FileToucherViewModel/>
@@ -30,18 +36,25 @@
             
             <Label Grid.Row="0" Grid.Column="0"  Content="File Toucher 0.2" Style="{StaticResource TitleBarLabelStyle}"></Label>
 
-            <Button Grid.Row="0" Grid.Column="2"  Content="Minimize" Click="MinimizeButton_Click"/>
-            <Button Grid.Row="0" Grid.Column="3"  Content="Restore" Click="RestoreButton_Click"/>
-            <Button Grid.Row="0" Grid.Column="4"  Content="Close" Command="{Binding ExitClicked}"/>
-            
+            <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource TitleBarButtonStyle}" Click="MinimizeButton_Click">
+                <Image Source="Resources\MinimizeButton.png" Width="20" Height="20"/>
+            </Button>
+            <Button Grid.Row="0" Grid.Column="3" Style="{StaticResource TitleBarButtonStyle}" Click="RestoreButton_Click">
+                <Image Name="RestoreButtonImage" Source="Resources\MaximizeButton.png" Width="20" Height="20"/>
+            </Button>
+            <Button Grid.Row="0" Grid.Column="4" Style="{StaticResource TitleBarButtonStyle}" Margin="3,6,6,0" Command="{Binding ExitClicked}">
+                <Image Source="Resources\CloseButton.png" Width="20" Height="20"/>
+            </Button>
+
         </Grid>
         
         <Menu Style="{StaticResource MenuStyle}" DockPanel.Dock="Top" Height="Auto" BorderBrush="#aaaaaa" BorderThickness="0,0,0,1" VerticalAlignment="Top">
             <MenuItem Style="{StaticResource MenuItemStyle}" Header="_File">
-                <MenuItem Header="_Exit" Style="{StaticResource MenuItemStyle}" Command="{Binding ExitClicked}"/>
+                <MenuItem Header="_Test" Style="{StaticResource SubMenuItemStyle}" InputGestureText="Alt+C" Command="{Binding ExitClicked}"/>
+                <MenuItem Header="_Exit" Style="{StaticResource SubMenuItemStyle}" InputGestureText="Alt+F4" Command="{Binding ExitClicked}"/>
             </MenuItem>
             <MenuItem Style="{StaticResource MenuItemStyle}" Header="_Help">
-                <MenuItem Header="_About" Style="{StaticResource MenuItemStyle}" Command="{Binding AboutClicked}"/>
+                <MenuItem Header="_About" Style="{StaticResource SubMenuItemStyle}" Command="{Binding AboutClicked}"/>
             </MenuItem>
         </Menu>
 

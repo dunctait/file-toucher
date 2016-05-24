@@ -5,6 +5,8 @@
 
     <Color x:Key="ForegroundColor">#c6dfe8</Color>
     <Color x:Key="TitleBackgroundColor">#323335</Color>
+    <Color x:Key="TitleBackgroundHighlightColor">#525457</Color>
+    <Color x:Key="TitleBackgroundHighlight2Color">#727478</Color>
     <Color x:Key="BackgroundColor">#DFDFDF</Color>
 
     <Color x:Key="ButtonColor">#3C659E</Color>
@@ -13,6 +15,9 @@
 
     <SolidColorBrush Color ="#C6DFE8" x:Key="ForegroundBrush"/>
     <SolidColorBrush Color ="#323335" x:Key="TitleBackgroundBrush"/>
+    <SolidColorBrush Color ="#525457" x:Key="TitleBackgroundHighlightBrush"/>
+    <SolidColorBrush Color ="#727478" x:Key="TitleBackgroundHighlight2Brush"/>
+    <SolidColorBrush Color ="#909194" x:Key="TitleBackgroundHighlight3Brush"/>
     <SolidColorBrush Color ="#DFDFDF" x:Key="BackgroundBrush"/>
 
 
@@ -46,8 +51,50 @@
         <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" />
         <Setter Property="FontSize" Value="18"/>
         <Setter Property="Margin" Value="0"/>
-        <Setter Property="Padding" Value="6,5,0,0"/>
+        <Setter Property="Padding" Value="14,8,0,2"/>
         <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <Style x:Key="TitleBarButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Background" Value="{DynamicResource TitleBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TitleBackgroundHighlightBrush}" />
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Margin" Value="3,6,3,0"/>
+        <Setter Property="Padding" Value="4"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Name="border"
+                       BorderThickness="1"
+                       Padding="4"
+                       BorderBrush="{DynamicResource TitleBackgroundHighlightBrush}"
+                       CornerRadius="0"
+                       Margin="0"
+                       Background="{TemplateBinding Background}">
+
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource TitleBackgroundHighlightBrush}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource TitleBackgroundHighlight3Brush}"/>
+                <Setter Property="RenderTransform" >
+                    <Setter.Value>
+                        <TranslateTransform Y="1.0" />
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="Background" Value="{DynamicResource ButtonBrush-2}"/>
+            </Trigger>
+        </Style.Triggers>
+
     </Style>
 
     <Style x:Key="GridStyle" TargetType="{x:Type Grid}">
@@ -66,9 +113,14 @@
     <Style x:Key="MenuItemStyle" TargetType="{x:Type MenuItem}">
         <Setter Property="Background" Value="{DynamicResource TitleBackgroundBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" />
-        <Setter Property="Padding" Value="6,5,6,5" />
-        <Setter Property="Margin" Value="0"/>
     </Style>
+
+    <Style x:Key="SubMenuItemStyle" TargetType="{x:Type MenuItem}">
+        <Setter Property="Background" Value="{DynamicResource TitleBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" />
+    </Style>
+
+
 
 
     <Style x:Key="DataGridStyle" TargetType="{x:Type DataGrid}">
@@ -133,7 +185,8 @@
     </Style>
 
     <Style x:Key="StatusBarItemStyle" TargetType="{x:Type StatusBarItem}">
-        
+        <Setter Property="Margin" Value="2"/>
     </Style>
+
 
 </ResourceDictionary>

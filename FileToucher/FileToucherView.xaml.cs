@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-
+using System.Windows.Media.Imaging;
 
 
 namespace FileToucher
@@ -15,6 +15,9 @@ namespace FileToucher
     {
 
         private bool _restoreIfMove;
+
+        private BitmapImage _restoreButtonImage = new BitmapImage(new Uri("/FileToucher;component/Resources/RestoreButton.png", UriKind.Relative));
+        private BitmapImage _maximizeButtonImage = new BitmapImage(new Uri("/FileToucher;component/Resources/MaximizeButton.png", UriKind.Relative));
 
         public FileToucherView()
         {
@@ -41,11 +44,13 @@ namespace FileToucher
                 case WindowState.Normal:
                     {
                         WindowState = WindowState.Maximized;
+                        RestoreButtonImage.Source = _restoreButtonImage;
                         break;
                     }
                 case WindowState.Maximized:
                     {
                         WindowState = WindowState.Normal;
+                        RestoreButtonImage.Source = _maximizeButtonImage;
                         break;
                     }
             }
