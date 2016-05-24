@@ -22,13 +22,13 @@ Style dialogs
 
 Add an "Add Directory with File Mask" function, or at least by file extension.
 
-Add progress windows (with Cancel function) and some sort of threading in case people "Add Directory -> C:/*.*" etc.
-
 Add option to save file list that can be imported later to save people finding and adding files again.
 
 Save last folder that files were added from
 
-Add language selection
+Add language selection/datetime format selection
+
+Add progress windows (with Cancel function) and some sort of threading in case people "Add Directory -> C:/*.*" etc.
 
 # Acknowledgements
 

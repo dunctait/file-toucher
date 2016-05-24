@@ -34,23 +34,22 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             
-            <Label Grid.Row="0" Grid.Column="0"  Content="File Toucher 0.2" Style="{StaticResource TitleBarLabelStyle}"></Label>
+            <Label Grid.Row="0" Grid.Column="0"  Content="File Toucher 0.2" Style="{StaticResource TitleBarLabelStyle}"/>
 
             <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource TitleBarButtonStyle}" Click="MinimizeButton_Click">
-                <Image Source="Resources\MinimizeButton.png" Width="20" Height="20"/>
+                <Image Source="Resources\MinimizeButton.png" Width="16" Height="16"/>
             </Button>
             <Button Grid.Row="0" Grid.Column="3" Style="{StaticResource TitleBarButtonStyle}" Click="RestoreButton_Click">
-                <Image Name="RestoreButtonImage" Source="Resources\MaximizeButton.png" Width="20" Height="20"/>
+                <Image Name="RestoreButtonImage" Source="Resources\MaximizeButton.png" Width="16" Height="16"/>
             </Button>
             <Button Grid.Row="0" Grid.Column="4" Style="{StaticResource TitleBarButtonStyle}" Margin="3,6,6,0" Command="{Binding ExitClicked}">
-                <Image Source="Resources\CloseButton.png" Width="20" Height="20"/>
+                <Image Source="Resources\CloseButton.png" Width="16" Height="16"/>
             </Button>
 
         </Grid>
         
         <Menu Style="{StaticResource MenuStyle}" DockPanel.Dock="Top" Height="Auto" BorderBrush="#aaaaaa" BorderThickness="0,0,0,1" VerticalAlignment="Top">
             <MenuItem Style="{StaticResource MenuItemStyle}" Header="_File">
-                <MenuItem Header="_Test" Style="{StaticResource SubMenuItemStyle}" InputGestureText="Alt+C" Command="{Binding ExitClicked}"/>
                 <MenuItem Header="_Exit" Style="{StaticResource SubMenuItemStyle}" InputGestureText="Alt+F4" Command="{Binding ExitClicked}"/>
             </MenuItem>
             <MenuItem Style="{StaticResource MenuItemStyle}" Header="_Help">
@@ -124,7 +123,7 @@
             <local:CustomDataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Filename}" Header="Filename" />
                 <DataGridTextColumn Binding="{Binding Directory}" Header="Directory" />
-                <DataGridTextColumn Binding="{Binding AccessedOn}" Header="Accessed On">
+                <DataGridTextColumn Binding="{Binding AccessedOn, StringFormat=\{0:dd MMM yyyy HH:mm:ss\}}" Header="Accessed On">
                     <DataGridTextColumn.CellStyle>
                         <Style TargetType="DataGridCell">
                             <Style.Triggers>
