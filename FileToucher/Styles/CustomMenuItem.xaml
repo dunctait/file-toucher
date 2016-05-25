@@ -132,7 +132,7 @@
 
     <!-- TopLevelHeader -->
     <ControlTemplate x:Key="{x:Static MenuItem.TopLevelHeaderTemplateKey}" TargetType="MenuItem">
-        <Border Name="Border" >
+        <Border Name="Border"  Background="Transparent">
             <Grid>
                 <ContentPresenter
                     ContentSource="Header"
@@ -186,7 +186,7 @@
     <!-- TopLevelItem -->
 
     <ControlTemplate x:Key="{x:Static MenuItem.TopLevelItemTemplateKey}" TargetType="MenuItem">
-        <Border Name="Border">
+        <Border Name="Border" Background="Transparent">
             <Grid>
                 <ContentPresenter
                     Margin="6,3,6,3" 
@@ -208,7 +208,7 @@
     <!-- SubmenuItem -->
 
     <ControlTemplate x:Key="{x:Static MenuItem.SubmenuItemTemplateKey}" TargetType="MenuItem">
-        <Border Name="Border" >
+        <Border Name="Border"  Background="Transparent">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="Icon"/>
@@ -243,6 +243,7 @@
                     Grid.Column="1"
                     ContentSource="Header"
                     Margin="0"
+                    VerticalAlignment="Center"
                     RecognizesAccessKey="True">
 
                     <ContentPresenter.Resources>
@@ -258,7 +259,8 @@
                     Text="{TemplateBinding InputGestureText}"
                     Foreground="{StaticResource TitleBackgroundHighlight3Brush}"
                     FontSize="10"
-                    Margin="5"
+                    Margin="0"
+                    Padding="12"
                     DockPanel.Dock="Right"
                     VerticalAlignment="Center"/>
             </Grid>
@@ -287,7 +289,7 @@
     <!-- SubmenuHeader -->
 
     <ControlTemplate x:Key="{x:Static MenuItem.SubmenuHeaderTemplateKey}" TargetType="MenuItem">
-        <Border Name="Border" >
+        <Border Name="Border"  Background="Transparent">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="Icon"/>

@@ -8,8 +8,7 @@ using Microsoft.Win32;
 using System.Linq;
 using System.IO;
 using System.Windows;
-using System.Windows.Media.Animation;
-using Ookii.Dialogs.Wpf;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace FileToucher
 {
@@ -273,7 +272,6 @@ namespace FileToucher
         /// </summary>
         private void OpeningSetup()
         {
-            // TODO: Load up previous session settings here once they are saved somewhere
 
             // Set the checkboxes we want ticked to true at startup
             AccessedCheck = false;
@@ -298,9 +296,9 @@ namespace FileToucher
         /// </summary>
         public void AddFiles()
         {
+
             var dialog = new OpenFileDialog
             {
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                 Multiselect = true
             };
 
@@ -333,17 +331,24 @@ namespace FileToucher
         /// </summary>
         public void AddDirectory()
         {
-            var dialog = new VistaFolderBrowserDialog
+
+            var dialog = new CommonOpenFileDialog
             {
-                Description = "Please select a folder.",
-                UseDescriptionForTitle = true
+                AllowNonFileSystemItems = true,
+                IsFolderPicker = true,
+                Title = "Select folder"
             };
 
-            object showDialog = dialog.ShowDialog();
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+            {
+                //MessageBox.Show("No Folder selected");
+                return;
+            }
 
-            if (showDialog == null || !(bool) showDialog) return;
+            // get all the directories in selected dirctory
+            var directory = dialog.FileName;
 
-            var successfulAdds = RecursiveFolderSearch(dialog.SelectedPath, 0);
+            var successfulAdds = RecursiveFolderSearch(directory, 0);
 
             switch (successfulAdds)
             {
@@ -365,7 +370,7 @@ namespace FileToucher
 
             foreach (string file in Directory.GetFiles(path))
             {
-                if (AddFile(file)) { totalAdded++; };
+                if (AddFile(file)) { totalAdded++; }
             }
             foreach (string subDir in Directory.GetDirectories(path))
             {
