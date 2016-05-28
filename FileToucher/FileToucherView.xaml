@@ -50,6 +50,8 @@
         
         <Menu Style="{StaticResource MenuStyle}" DockPanel.Dock="Top" Height="Auto" BorderBrush="#aaaaaa" BorderThickness="0,0,0,1" VerticalAlignment="Top">
             <MenuItem Style="{StaticResource MenuItemStyle}" Header="_File">
+                <MenuItem Header="_Open File List" Style="{StaticResource SubMenuItemStyle}" InputGestureText="Ctrl+O" Command="{Binding OpenClicked}"/>
+                <MenuItem Header="_Save File List" Style="{StaticResource SubMenuItemStyle}" InputGestureText="Ctrl+S" Command="{Binding SaveClicked}"/>
                 <MenuItem Header="_Exit" Style="{StaticResource SubMenuItemStyle}" InputGestureText="Alt+F4" Command="{Binding ExitClicked}"/>
             </MenuItem>
             <MenuItem Style="{StaticResource MenuItemStyle}" Header="_Help">

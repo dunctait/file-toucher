@@ -7,6 +7,7 @@ using System.Windows.Input;
 using Microsoft.Win32;
 using System.Linq;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
@@ -254,8 +255,11 @@ namespace FileToucher
 
         public ICommand TouchFilesClicked => new DelegateCommand(TouchFiles);
 
+        public ICommand OpenClicked => new DelegateCommand(OpenFileList);
+        public ICommand SaveClicked => new DelegateCommand(SaveFileList);
         public ICommand ExitClicked => new DelegateCommand(Exit);
         public ICommand AboutClicked => new DelegateCommand(ShowAbout);
+
 
         #endregion Properties
 
@@ -320,7 +324,7 @@ namespace FileToucher
                     StatusBarText = "1 file added to list.";
                     break;
                 default:
-                    StatusBarText = successfulAdds.ToString() + " files added to list.";
+                    StatusBarText = successfulAdds + " files added to list.";
                     break;
             }
 
@@ -359,7 +363,7 @@ namespace FileToucher
                     StatusBarText = "1 file added to list.";
                     break;
                 default:
-                    StatusBarText = successfulAdds.ToString() + " files added to list.";
+                    StatusBarText = successfulAdds + " files added to list.";
                     break;
             }
         }
@@ -443,7 +447,7 @@ namespace FileToucher
             }
 
             SelectedRows.Clear();
-            StatusBarText = totalToRemove.ToString() + " files removed from list.";
+            StatusBarText = totalToRemove + " files removed from list.";
 
         }
 
@@ -460,7 +464,7 @@ namespace FileToucher
             }
 
             _selectedFiles.Clear();
-            StatusBarText = totalCleared.ToString() + " files removed from list.";
+            StatusBarText = totalCleared + " files removed from list.";
         }
 
         /// <summary>
@@ -589,7 +593,7 @@ namespace FileToucher
                 }
             }
 
-            StatusBarText = touches.ToString() + " files touched.";
+            StatusBarText = touches + " files touched.";
 
             if (anyErrors)
             {
@@ -614,6 +618,75 @@ namespace FileToucher
 
                 _selectedFiles[i] = tempFile;
             }
+
+        }
+
+        /// <summary>
+        /// Open a saved file list and load all files
+        /// </summary>
+        private void OpenFileList()
+        {
+            // show message, you will lose all currently loaded files!
+            // if okay...
+
+            var dialog = new OpenFileDialog { Filter = "FileToucher file (*.ftfl) | *.ftfl" };
+            if (dialog.ShowDialog() != true) return;
+
+            // clear list
+
+            var fileList = File.ReadAllLines(dialog.FileName);
+
+            if (fileList.Any()) { _selectedFiles.Clear(); }
+
+            var successfulAdds = 0;
+
+            foreach (var fileToBeAdded in fileList)
+            {
+                if (AddFile(fileToBeAdded))
+                {
+                    successfulAdds++;};
+            }
+
+            switch (successfulAdds)
+            {
+                case 0:
+                    StatusBarText = "No files were loaded.";
+                    break;
+                case 1:
+                    StatusBarText = "1 file loaded.";
+                    break;
+                default:
+                    StatusBarText = successfulAdds + " files loaded.";
+                    break;
+            }
+
+        }
+
+        /// <summary>
+        /// Save list of files to file
+        /// </summary>
+        private void SaveFileList()
+        {
+            var dialog = new SaveFileDialog {Filter = "FileToucher file (*.ftfl) | *.ftfl"};
+            if (dialog.ShowDialog() != true) return;
+
+            var saveLocation = dialog.FileName;
+
+            WriteListToFile(saveLocation);
+
+        }
+
+        private void WriteListToFile(string saveLocation)
+        {
+
+            string allFilesString = "";
+
+            foreach (TouchFiles file in _selectedFiles)
+            {
+                allFilesString += file.Fullpath + Environment.NewLine;
+            }
+
+            File.WriteAllText(saveLocation, allFilesString);
 
         }
 

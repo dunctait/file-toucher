@@ -13,11 +13,10 @@ namespace FileToucher
     /// </summary>
     public partial class FileToucherView
     {
-
         private bool _restoreIfMove;
 
-        private BitmapImage _restoreButtonImage = new BitmapImage(new Uri("/FileToucher;component/Resources/RestoreButton.png", UriKind.Relative));
-        private BitmapImage _maximizeButtonImage = new BitmapImage(new Uri("/FileToucher;component/Resources/MaximizeButton.png", UriKind.Relative));
+        private readonly BitmapImage _restoreButtonImage = new BitmapImage(new Uri("/FileToucher;component/Resources/RestoreButton.png", UriKind.Relative));
+        private readonly BitmapImage _maximizeButtonImage = new BitmapImage(new Uri("/FileToucher;component/Resources/MaximizeButton.png", UriKind.Relative));
 
         public FileToucherView()
         {
@@ -29,7 +28,7 @@ namespace FileToucher
         /// </summary>
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
-            this.WindowState = WindowState.Minimized;
+            WindowState = WindowState.Minimized;
         }
 
         private void RestoreButton_Click(object sender, RoutedEventArgs e)
@@ -104,12 +103,12 @@ namespace FileToucher
             DragMove();
         }
 
-        #region IgnorableCode
+        #region MaximizeCode
 
         private void Window_SourceInitialized(object sender, EventArgs e)
         {
             IntPtr mWindowHandle = (new WindowInteropHelper(this)).Handle;
-            HwndSource.FromHwnd(mWindowHandle).AddHook(new HwndSourceHook(WindowProc));
+            HwndSource.FromHwnd(mWindowHandle)?.AddHook(new HwndSourceHook(WindowProc));
         }
 
         private static System.IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -227,6 +226,6 @@ namespace FileToucher
             }
         }
 
-        #endregion IgnorableCode
+        #endregion MaximizeCode
     }
 }
