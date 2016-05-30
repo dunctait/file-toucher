@@ -1,9 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 
 namespace FileToucher
@@ -18,9 +21,13 @@ namespace FileToucher
         private readonly BitmapImage _restoreButtonImage = new BitmapImage(new Uri("/FileToucher;component/Resources/RestoreButton.png", UriKind.Relative));
         private readonly BitmapImage _maximizeButtonImage = new BitmapImage(new Uri("/FileToucher;component/Resources/MaximizeButton.png", UriKind.Relative));
 
+        private FileToucherViewModel _viewModel;
+
         public FileToucherView()
         {
             InitializeComponent();
+
+            _viewModel = (FileToucherViewModel)DataContext;
         }
 
         /// <summary>
@@ -101,6 +108,71 @@ namespace FileToucher
             Top = lMousePosition.Y - targetVertical;
 
             DragMove();
+        }
+
+        private void AddDirectoryClicked(object sender, RoutedEventArgs e)
+        {
+            var dialog = new CommonOpenFileDialog
+            {
+                AllowNonFileSystemItems = true,
+                IsFolderPicker = true,
+                Title = "Select folder"
+            };
+
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+            {
+                //MessageBox.Show("No Folder selected");
+                return;
+            }
+
+            // get all the directories in selected dirctory
+            var directory = dialog.FileName;
+
+            _viewModel.AddDirectory(directory);
+        }
+
+        private void AddFilesClicked(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog
+            {
+                Multiselect = true
+            };
+
+            if (dialog.ShowDialog() != true) return;
+
+            _viewModel.AddFiles(dialog.FileNames);
+        }
+
+        private void OpenClicked(object sender, RoutedEventArgs e)
+        {
+
+            var warningDialog = new CustomDialog("If you open a saved list you will lose the files currently loaded into FileToucher", "Warning", true);
+            warningDialog.ShowDialog();
+
+            // if the user clicked cancel then don't open the file dialog
+            if (!warningDialog.getResult())
+            {
+                return;
+            }
+
+            var dialog = new OpenFileDialog { Filter = "FileToucher file (*.ftfl) | *.ftfl" };
+            if (dialog.ShowDialog() != true) return;
+
+            // clear list
+
+            var fileList = File.ReadAllLines(dialog.FileName);
+
+            _viewModel.OpenFileList(fileList);
+        }
+
+        private void SaveClicked(object sender, RoutedEventArgs e)
+        {
+            var dialog = new SaveFileDialog { Filter = "FileToucher file (*.ftfl) | *.ftfl" };
+            if (dialog.ShowDialog() != true) return;
+
+            var saveLocation = dialog.FileName;
+
+            _viewModel.SaveFileList(saveLocation);
         }
 
         #region MaximizeCode

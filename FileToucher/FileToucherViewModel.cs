@@ -4,12 +4,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Input;
-using Microsoft.Win32;
 using System.Linq;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Windows;
-using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace FileToucher
 {
@@ -43,6 +40,12 @@ namespace FileToucher
 
         // Create string for holding the status bar message
         private string _statusBarText = "";
+
+        // Create boolean to control showing generic dialog
+        private bool _dialogVisible = false;
+
+        // Create string to hold dialog message
+        private string _dialogText = "";
 
         #endregion Variables
 
@@ -246,17 +249,36 @@ namespace FileToucher
             set { _statusBarText = value; RaisePropertyChanged("StatusBarText"); }
         }
 
-        // The following ICommands are for binding button clicks to methods
-        public ICommand AddFilesClicked => new DelegateCommand(AddFiles);
+        // Create property that signifies when dialog should be visible
+        public bool DialogVisible
+        {
+            get { return _dialogVisible; }
+            set
+            {
+                if (_dialogVisible == value) return;
+                _dialogVisible = value;
+                RaisePropertyChanged("DialogVisible");
+            }
+        }
 
-        public ICommand AddDirectoryClicked => new DelegateCommand(AddDirectory);
+        // Create property that holds the dialog text
+        public string DialogText
+        {
+            get { return _dialogText; }
+            set
+            {
+                if (_dialogText == value) return;
+                _dialogText = value;
+                RaisePropertyChanged("DialogText");
+            }
+        }
+
+        // The following ICommands are for binding button clicks to methods
         public ICommand RemoveSelectedClicked => new DelegateCommand(RemoveSelected);
         public ICommand RemoveAllClicked => new DelegateCommand(RemoveAll);
 
         public ICommand TouchFilesClicked => new DelegateCommand(TouchFiles);
 
-        public ICommand OpenClicked => new DelegateCommand(OpenFileList);
-        public ICommand SaveClicked => new DelegateCommand(SaveFileList);
         public ICommand ExitClicked => new DelegateCommand(Exit);
         public ICommand AboutClicked => new DelegateCommand(ShowAbout);
 
@@ -298,19 +320,12 @@ namespace FileToucher
         /// <summary>
         /// Creates file browser dialog, and passes selected files to AddFile() method
         /// </summary>
-        public void AddFiles()
+        public void AddFiles(string[] filenameStrings)
         {
-
-            var dialog = new OpenFileDialog
-            {
-                Multiselect = true
-            };
-
-            if (dialog.ShowDialog() != true) return;
 
             var successfulAdds = 0;
 
-            foreach (var filename in dialog.FileNames)
+            foreach (var filename in filenameStrings)
             {
                 if (AddFile(filename)) successfulAdds++;
             }
@@ -333,24 +348,8 @@ namespace FileToucher
         /// <summary>
         /// Creates folder browser dialog, passes each file in folder and subfolder to AddFile()
         /// </summary>
-        public void AddDirectory()
+        public void AddDirectory(string directory)
         {
-
-            var dialog = new CommonOpenFileDialog
-            {
-                AllowNonFileSystemItems = true,
-                IsFolderPicker = true,
-                Title = "Select folder"
-            };
-
-            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
-            {
-                //MessageBox.Show("No Folder selected");
-                return;
-            }
-
-            // get all the directories in selected dirctory
-            var directory = dialog.FileName;
 
             var successfulAdds = RecursiveFolderSearch(directory, 0);
 
@@ -430,7 +429,7 @@ namespace FileToucher
         /// <summary>
         /// Reads which files are selected in the UI DataGrid and removes them
         /// </summary>
-        public void RemoveSelected()
+        private void RemoveSelected()
         {
             if (SelectedRows.Count == 0)
             {
@@ -454,7 +453,7 @@ namespace FileToucher
         /// <summary>
         /// Removes all TouchFiles currently selected
         /// </summary>
-        public void RemoveAll()
+        private void RemoveAll()
         {
             var totalCleared = _selectedFiles.Count;
             if (totalCleared == 0)
@@ -470,7 +469,7 @@ namespace FileToucher
         /// <summary>
         /// Loops through list of files and changes the 3 date stamps
         /// </summary>
-        public void TouchFiles()
+        private void TouchFiles()
         {
 
             // Check that an attribute to edit has actually been selected
@@ -624,27 +623,19 @@ namespace FileToucher
         /// <summary>
         /// Open a saved file list and load all files
         /// </summary>
-        private void OpenFileList()
+        public void OpenFileList(string[] fileList)
         {
-            // show message, you will lose all currently loaded files!
-            // if okay...
-
-            var dialog = new OpenFileDialog { Filter = "FileToucher file (*.ftfl) | *.ftfl" };
-            if (dialog.ShowDialog() != true) return;
-
-            // clear list
-
-            var fileList = File.ReadAllLines(dialog.FileName);
-
+            
             if (fileList.Any()) { _selectedFiles.Clear(); }
 
             var successfulAdds = 0;
 
-            foreach (var fileToBeAdded in fileList)
+            foreach (var fileToBeAdded in fileList.Where(fileToBeAdded => fileToBeAdded != ""))
             {
                 if (AddFile(fileToBeAdded))
                 {
-                    successfulAdds++;};
+                    successfulAdds++;
+                }
             }
 
             switch (successfulAdds)
@@ -665,14 +656,12 @@ namespace FileToucher
         /// <summary>
         /// Save list of files to file
         /// </summary>
-        private void SaveFileList()
+        public void SaveFileList(string saveLocation)
         {
-            var dialog = new SaveFileDialog {Filter = "FileToucher file (*.ftfl) | *.ftfl"};
-            if (dialog.ShowDialog() != true) return;
-
-            var saveLocation = dialog.FileName;
 
             WriteListToFile(saveLocation);
+
+            StatusBarText = "File list saved.";
 
         }
 
@@ -703,7 +692,7 @@ namespace FileToucher
         /// </summary>
         public void ShowAbout()
         {    
-            Xceed.Wpf.Toolkit.MessageBox.Show("Tile Toucher 0.2 created by Duncan Tait.\nGithub repository: https://github.com/dunctait/file-toucher", "About file-toucher", MessageBoxButton.OK, MessageBoxImage.Information);
+            Xceed.Wpf.Toolkit.MessageBox.Show("File Toucher 0.2 created by Duncan Tait.\nGithub repository: https://github.com/dunctait/file-toucher", "About file-toucher", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
     }

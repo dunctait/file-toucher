@@ -18,7 +18,7 @@
     <Window.DataContext>
         <local:FileToucherViewModel/>
     </Window.DataContext>
-    
+
 
     <DockPanel>
 
@@ -33,25 +33,25 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            
+
             <Label Grid.Row="0" Grid.Column="0"  Content="File Toucher 0.2" Style="{StaticResource TitleBarLabelStyle}"/>
 
-            <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource TitleBarButtonStyle}" Click="MinimizeButton_Click">
+            <Button Width="32" Grid.Row="0" Grid.Column="2" Style="{StaticResource TitleBarButtonStyle}" Click="MinimizeButton_Click">
                 <Image Source="Resources\MinimizeButton.png" Width="16" Height="16"/>
             </Button>
-            <Button Grid.Row="0" Grid.Column="3" Style="{StaticResource TitleBarButtonStyle}" Click="RestoreButton_Click">
+            <Button Width="32" Grid.Row="0" Grid.Column="3" Style="{StaticResource TitleBarButtonStyle}" Click="RestoreButton_Click">
                 <Image Name="RestoreButtonImage" Source="Resources\MaximizeButton.png" Width="16" Height="16"/>
             </Button>
-            <Button Grid.Row="0" Grid.Column="4" Style="{StaticResource TitleBarButtonStyle}" Margin="3,6,6,0" Command="{Binding ExitClicked}">
+            <Button Width="32" Grid.Row="0" Grid.Column="4" Style="{StaticResource TitleBarButtonStyle}" Margin="3,6,6,0" Command="{Binding ExitClicked}">
                 <Image Source="Resources\CloseButton.png" Width="16" Height="16"/>
             </Button>
 
         </Grid>
-        
+
         <Menu Style="{StaticResource MenuStyle}" DockPanel.Dock="Top" Height="Auto" BorderBrush="#aaaaaa" BorderThickness="0,0,0,1" VerticalAlignment="Top">
             <MenuItem Style="{StaticResource MenuItemStyle}" Header="_File">
-                <MenuItem Header="_Open File List" Style="{StaticResource SubMenuItemStyle}" InputGestureText="Ctrl+O" Command="{Binding OpenClicked}"/>
-                <MenuItem Header="_Save File List" Style="{StaticResource SubMenuItemStyle}" InputGestureText="Ctrl+S" Command="{Binding SaveClicked}"/>
+                <MenuItem Header="_Open File List" Style="{StaticResource SubMenuItemStyle}" InputGestureText="Ctrl+O" Click="OpenClicked"/>
+                <MenuItem Header="_Save File List" Style="{StaticResource SubMenuItemStyle}" InputGestureText="Ctrl+S" Click="SaveClicked"/>
                 <MenuItem Header="_Exit" Style="{StaticResource SubMenuItemStyle}" InputGestureText="Alt+F4" Command="{Binding ExitClicked}"/>
             </MenuItem>
             <MenuItem Style="{StaticResource MenuItemStyle}" Header="_Help">
@@ -115,8 +115,8 @@
         </Grid>
 
         <StackPanel Height="Auto" DockPanel.Dock="Right" VerticalAlignment="Stretch" MinWidth="150">
-            <Button Margin="5,10,10,5" Style="{StaticResource ButtonStyle}" Command="{Binding AddFilesClicked}">Add Files</Button>
-            <Button Margin="5,5,10,5" Style="{StaticResource ButtonStyle}" Command="{Binding AddDirectoryClicked}">Add Directory</Button>
+            <Button Margin="5,10,10,5" Style="{StaticResource ButtonStyle}" Click="AddFilesClicked">Add Files</Button>
+            <Button Margin="5,5,10,5" Style="{StaticResource ButtonStyle}" Click="AddDirectoryClicked">Add Directory</Button>
             <Button Margin="5,15,10,5" Style="{StaticResource ButtonStyle}" Command="{Binding RemoveSelectedClicked}">Remove Selected</Button>
             <Button Margin="5,5,10,5" Style="{StaticResource ButtonStyle}" Command="{Binding RemoveAllClicked}">Remove All</Button>
         </StackPanel>
@@ -159,7 +159,7 @@
                     </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
                 <DataGridTextColumn Binding="{Binding Extension}" Header="File Extension" />
-                </local:CustomDataGrid.Columns>
+            </local:CustomDataGrid.Columns>
             <local:CustomDataGrid.Resources>
                 <Style TargetType="{x:Type DataGridRow}" >
                     <Setter Property="Background" Value="White"/>

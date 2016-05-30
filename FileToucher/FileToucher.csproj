@@ -34,6 +34,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>
+    </ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WindowsAPICodePack-Core.1.1.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
@@ -84,9 +88,16 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="CustomDataGrid.cs" />
+    <Compile Include="CustomDialog.xaml.cs">
+      <DependentUpon>CustomDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FileToucherViewModel.cs" />
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="TouchFiles.cs" />
+    <Page Include="CustomDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FileToucherView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -143,6 +154,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\MaximizeButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ErrorIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\InfoIcon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
