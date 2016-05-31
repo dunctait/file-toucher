@@ -7,9 +7,11 @@ using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using FileToucher.ViewModel;
+using GalaSoft.MvvmLight.Messaging;
 
 
-namespace FileToucher
+namespace FileToucher.View
 {
     /// <summary>
     /// Interaction logic for FileToucherView.xaml
@@ -21,28 +23,42 @@ namespace FileToucher
         private readonly BitmapImage _restoreButtonImage = new BitmapImage(new Uri("/FileToucher;component/Resources/RestoreButton.png", UriKind.Relative));
         private readonly BitmapImage _maximizeButtonImage = new BitmapImage(new Uri("/FileToucher;component/Resources/MaximizeButton.png", UriKind.Relative));
 
-        private FileToucherViewModel _viewModel;
+        public static RoutedCommand OpenCommand = new RoutedCommand();
+        public static RoutedCommand SaveCommand = new RoutedCommand();
+
+        private readonly FileToucherViewModel _viewModel;
 
         public FileToucherView()
         {
             InitializeComponent();
 
+            Messenger.Default.Register<NotificationMessage>(this, NotificationMessageReceived);
+
+            OpenCommand.InputGestures.Add(new KeyGesture(Key.O, ModifierKeys.Control));
+            SaveCommand.InputGestures.Add(new KeyGesture(Key.S, ModifierKeys.Control));
+
             _viewModel = (FileToucherViewModel)DataContext;
         }
 
         /// <summary>
-        /// Minimize Button_Clicked
+        /// Minimize Button in title bar clicked
         /// </summary>
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
             WindowState = WindowState.Minimized;
         }
 
+        /// <summary>
+        /// Restore Button in title bar clicked
+        /// </summary>
         private void RestoreButton_Click(object sender, RoutedEventArgs e)
         {
             SwitchWindowState();
         }
 
+        /// <summary>
+        /// Handles Maximize/Restore logic (switches from maximized to normal and vice versa)
+        /// </summary>
         private void SwitchWindowState()
         {
             switch (WindowState)
@@ -62,6 +78,11 @@ namespace FileToucher
             }
         }
 
+        /// <summary>
+        /// Enables double-clicking on title bar to maximize and also click-to-drag on title bar
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TitleBarMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2)
@@ -145,15 +166,18 @@ namespace FileToucher
 
         private void OpenClicked(object sender, RoutedEventArgs e)
         {
-
-            var warningDialog = new CustomDialog("If you open a saved list you will lose the files currently loaded into FileToucher", "Warning", true);
-            warningDialog.ShowDialog();
-
-            // if the user clicked cancel then don't open the file dialog
-            if (!warningDialog.getResult())
+            if (_viewModel.SelectedTouchFiles.Count > 0)
             {
-                return;
+                var warningDialog = new CustomDialog("If you open a saved list you will lose the files currently loaded into FileToucher", "Warning", true);
+                warningDialog.ShowDialog();
+
+                // if the user clicked cancel then don't open the file dialog
+                if (!warningDialog.getResult())
+                {
+                    return;
+                }
             }
+            
 
             var dialog = new OpenFileDialog { Filter = "FileToucher file (*.ftfl) | *.ftfl" };
             if (dialog.ShowDialog() != true) return;
@@ -173,6 +197,19 @@ namespace FileToucher
             var saveLocation = dialog.FileName;
 
             _viewModel.SaveFileList(saveLocation);
+        }
+
+        /// <summary>
+        /// This method will handle all messages received and call appropriate methods
+        /// </summary>
+        /// <param name="msg"></param>
+        private void NotificationMessageReceived(NotificationMessage msg)
+        {
+            if (msg.Notification == "ShowDialog")
+            {
+                var newDialog = new CustomDialog {DataContext = DataContext};
+                newDialog.ShowDialog();
+            }
         }
 
         #region MaximizeCode

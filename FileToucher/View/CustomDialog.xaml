@@ -3,12 +3,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:FileToucher"
+        xmlns:viewModel="clr-namespace:FileToucher.ViewModel"
         mc:Ignorable="d"
-        Name="CustomDialogWindow" Visibility="{Binding DialogVisible}" WindowStyle="None" AllowsTransparency="True" ResizeMode="NoResize"  WindowStartupLocation="CenterScreen" Style="{StaticResource WindowStyle}" Height="180" Width="400">
+        Name="CustomDialogWindow" 
+        WindowStyle="None" 
+        AllowsTransparency="True" 
+        ResizeMode="NoResize"  
+        WindowStartupLocation="CenterScreen" 
+        Style="{StaticResource WindowStyle}" 
+        Height="180" Width="400">
 
     <Window.DataContext>
-        <local:FileToucherViewModel/>
+        <viewModel:FileToucherViewModel/>
     </Window.DataContext>
 
     <DockPanel Height="Auto" Background="{StaticResource BackgroundBrush}">
@@ -23,10 +29,10 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Label Name="TitleLabel" Grid.Row="0" Grid.Column="1" Content="Information" Style="{StaticResource DialogTitleBarLabelStyle}"/>
+            <Label Name="TitleLabel" Grid.Row="0" Grid.Column="1" Content="{Binding DialogTitle}" Style="{StaticResource DialogTitleBarLabelStyle}"/>
 
             <Button Width="32" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="2" Style="{StaticResource TitleBarButtonStyle}" Margin="3,6,6,6" Click="CloseWindow">
-                <Image Source="Resources\CloseButton.png" Width="16" Height="16"/>
+                <Image Source="../Resources/CloseButton.png" Width="16" Height="16"/>
             </Button>
 
         </Grid>
@@ -43,13 +49,11 @@
 
             <StackPanel Name="ButtonStackPanel"  Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Content="Okay" Name="OkayButton" Style="{StaticResource ButtonStyle}" FontSize="18" Margin="8" Click="OkayClicked"/>
-                
-
             </StackPanel>
 
         </Grid>
 
-        <TextBox Name="MessageTextBox" Style="{StaticResource TextBoxStyle}"  DockPanel.Dock="Bottom" Text="No message found" ScrollViewer.CanContentScroll="True" Margin="0"/>
+        <TextBox Name="MessageTextBox" Text="{Binding DialogText}" Style="{StaticResource TextBoxStyle}"  DockPanel.Dock="Bottom" ScrollViewer.CanContentScroll="True" Margin="0"/>
        
         
     </DockPanel>

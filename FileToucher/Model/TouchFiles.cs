@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace FileToucher
+namespace FileToucher.Model
 {
     class TouchFiles : INotifyPropertyChanged
     {

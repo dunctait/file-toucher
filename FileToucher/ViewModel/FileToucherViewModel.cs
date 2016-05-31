@@ -1,26 +1,25 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Input;
 using System.Linq;
 using System.IO;
 using System.Windows;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+using FileToucher.Model;
+using GalaSoft.MvvmLight.Messaging;
 
-namespace FileToucher
+namespace FileToucher.ViewModel
 {
-    class FileToucherViewModel : INotifyPropertyChanged
+    class FileToucherViewModel : ViewModelBase
     {
         #region Variables
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        // Create Observable Collection for all files that are selected by the user and shown in DataGrid
         private readonly ObservableCollection<TouchFiles> _selectedFiles = new ObservableCollection<TouchFiles>();
 
         // Create list of items that are selected in DataGrid
-        private IList _selectedRowsList = new ArrayList();
 
         // Create array that holds booleans to determine whether the different attributes checkboxes are ticked or not
         private readonly bool[] _attributesToChangeBools = new bool[3];
@@ -42,10 +41,13 @@ namespace FileToucher
         private string _statusBarText = "";
 
         // Create boolean to control showing generic dialog
-        private bool _dialogVisible = false;
+        private bool _dialogVisible;
 
         // Create string to hold dialog message
         private string _dialogText = "";
+
+        // Create string to hold dialog title
+        private string _dialogTitle = "";
 
         #endregion Variables
 
@@ -58,7 +60,7 @@ namespace FileToucher
             {
                 if (_attributesToChangeBools[0] == value) { return; }
                 _attributesToChangeBools[0] = value;
-                RaisePropertyChanged("AccessedCheck");
+                RaisePropertyChanged();
                 AccessedNowCheckboxEnable = value;
                 AccessedNowCheck = value;
 
@@ -77,7 +79,7 @@ namespace FileToucher
             {
                 if (_attributesToChangeBools[1] == value) { return; }
                 _attributesToChangeBools[1] = value;
-                RaisePropertyChanged("ModifiedCheck");
+                RaisePropertyChanged();
                 ModifiedNowCheckboxEnable = value;
                 ModifiedNowCheck = value;
 
@@ -96,7 +98,7 @@ namespace FileToucher
             {
                 if (_attributesToChangeBools[2] == value) { return; }
                 _attributesToChangeBools[2] = value;
-                RaisePropertyChanged("CreatedCheck");
+                RaisePropertyChanged();
                 CreatedNowCheckboxEnable = value;
                 CreatedNowCheck = value;
 
@@ -115,7 +117,7 @@ namespace FileToucher
             set
             {
                 _attributesNowBools[0] = value;
-                RaisePropertyChanged("AccessedNowCheck");
+                RaisePropertyChanged();
 
                 // if unchecking/checking "Now" but still touching Accessed attribute: enable/disable DatePicker respectively
                 if (AccessedCheck) { AccessedDateTimeEnable = !value; }
@@ -128,7 +130,7 @@ namespace FileToucher
             set
             {
                 _attributesNowBools[1] = value;
-                RaisePropertyChanged("ModifiedNowCheck");
+                RaisePropertyChanged();
 
                 // if unchecking/checking "Now" but still touching Modified attribute: enable/disable DatePicker respectively
                 if (ModifiedCheck) { ModifiedDateTimeEnable = !value; }
@@ -141,7 +143,7 @@ namespace FileToucher
             set
             {
                 _attributesNowBools[2] = value;
-                RaisePropertyChanged("CreatedNowCheck");
+                RaisePropertyChanged();
 
                 // if unchecking/checking "Now" but still touching Created attribute: enable/disable DatePicker respectively
                 if (CreatedCheck) { CreatedDateTimeEnable = !value ;}
@@ -152,19 +154,19 @@ namespace FileToucher
         public bool AccessedNowCheckboxEnable
         {
             get { return _attributesNowEnabledBools[0]; }
-            set { _attributesNowEnabledBools[0] = value; RaisePropertyChanged("AccessedNowCheckboxEnable"); }
+            set { _attributesNowEnabledBools[0] = value; RaisePropertyChanged(); }
         }
 
         public bool ModifiedNowCheckboxEnable
         {
             get { return _attributesNowEnabledBools[1]; }
-            set { _attributesNowEnabledBools[1] = value; RaisePropertyChanged("ModifiedNowCheckboxEnable"); }
+            set { _attributesNowEnabledBools[1] = value; RaisePropertyChanged(); }
         }
 
         public bool CreatedNowCheckboxEnable
         {
             get { return _attributesNowEnabledBools[2]; }
-            set { _attributesNowEnabledBools[2] = value; RaisePropertyChanged("CreatedNowCheckboxEnable"); }
+            set { _attributesNowEnabledBools[2] = value; RaisePropertyChanged(); }
         }
 
         // The following 3 properties are the DateTimePicker enabling/disabling functionality
@@ -177,7 +179,7 @@ namespace FileToucher
                 AccessedDateTime = value ? DateTime.Now.ToString() : "";
 
                 _attributeDateTimeBools[0] = value;
-                RaisePropertyChanged("AccessedDateTimeEnable");
+                RaisePropertyChanged();
             }
         }
 
@@ -190,7 +192,7 @@ namespace FileToucher
                 ModifiedDateTime = value ? DateTime.Now.ToString() : "";
 
                 _attributeDateTimeBools[1] = value;
-                RaisePropertyChanged("ModifiedDateTimeEnable");
+                RaisePropertyChanged();
 
             }
         }
@@ -204,7 +206,7 @@ namespace FileToucher
                 CreatedDateTime = value ? DateTime.Now.ToString() : "";
 
                 _attributeDateTimeBools[2] = value;
-                RaisePropertyChanged("CreatedDateTimeEnable");
+                RaisePropertyChanged();
                 
             }
         }
@@ -213,40 +215,32 @@ namespace FileToucher
         public string AccessedDateTime
         {
             get { return _attributeDateTimes[0]; }
-            set { _attributeDateTimes[0] = value; RaisePropertyChanged("AccessedDateTime"); }
+            set { _attributeDateTimes[0] = value; RaisePropertyChanged(); }
         }
 
         public string ModifiedDateTime
         {
             get { return _attributeDateTimes[1]; }
-            set { _attributeDateTimes[1] = value; RaisePropertyChanged("ModifiedDateTime"); }
+            set { _attributeDateTimes[1] = value; RaisePropertyChanged(); }
         }
 
         public string CreatedDateTime
         {
             get { return _attributeDateTimes[2]; }
-            set { _attributeDateTimes[2] = value; RaisePropertyChanged("CreatedDateTime"); }
+            set { _attributeDateTimes[2] = value; RaisePropertyChanged(); }
         }
 
         // Create property that returns the _selectedFiles collection to allow binding to DataGrid
         public ObservableCollection<TouchFiles> SelectedTouchFiles => _selectedFiles;
 
         // Create property that returns or sets the _selectedRows list to allow us to remove them
-        public IList SelectedRows
-        {
-            get { return _selectedRowsList; }
-            set
-            {
-                _selectedRowsList = value;
-                RaisePropertyChanged("TestSelected");
-            }
-        }
+        public IList SelectedRows { get; set; } = new ArrayList();
 
         // Create property that returns or sets the _statusBarText string
         public string StatusBarText
         {
             get { return _statusBarText; }
-            set { _statusBarText = value; RaisePropertyChanged("StatusBarText"); }
+            set { _statusBarText = value; RaisePropertyChanged(); }
         }
 
         // Create property that signifies when dialog should be visible
@@ -257,7 +251,7 @@ namespace FileToucher
             {
                 if (_dialogVisible == value) return;
                 _dialogVisible = value;
-                RaisePropertyChanged("DialogVisible");
+                RaisePropertyChanged();
             }
         }
 
@@ -269,18 +263,33 @@ namespace FileToucher
             {
                 if (_dialogText == value) return;
                 _dialogText = value;
-                RaisePropertyChanged("DialogText");
+                RaisePropertyChanged();
             }
         }
 
+        // Create property that holds the dialog title
+        public string DialogTitle
+        {
+            get { return _dialogTitle; }
+            set
+            {
+                if (_dialogTitle == value) return;
+                _dialogTitle = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        // Create RelayCommand for message to show Dialog on main view
+        public RelayCommand ShowDialogCommand { private set; get; }
+
         // The following ICommands are for binding button clicks to methods
-        public ICommand RemoveSelectedClicked => new DelegateCommand(RemoveSelected);
-        public ICommand RemoveAllClicked => new DelegateCommand(RemoveAll);
+        public ICommand RemoveSelectedClicked => new RelayCommand(RemoveSelected);
+        public ICommand RemoveAllClicked => new RelayCommand(RemoveAll);
 
-        public ICommand TouchFilesClicked => new DelegateCommand(TouchFiles);
+        public ICommand TouchFilesClicked => new RelayCommand(TouchFiles);
 
-        public ICommand ExitClicked => new DelegateCommand(Exit);
-        public ICommand AboutClicked => new DelegateCommand(ShowAbout);
+        public ICommand ExitClicked => new RelayCommand(Exit);
+        public ICommand AboutClicked => new RelayCommand(ShowAbout);
 
 
         #endregion Properties
@@ -306,15 +315,8 @@ namespace FileToucher
 
             StatusBarText = "Program started.";
 
-        }
+            ShowDialogCommand = new RelayCommand(ShowDialogCommandExecute);
 
-        /// <summary>
-        /// Notifies a bound view that a property has changed, instigating an update on the view
-        /// </summary>
-        /// <param name="propertyName"></param>
-        protected void RaisePropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         /// <summary>
@@ -420,7 +422,7 @@ namespace FileToucher
             catch (Exception errorException)
             {
                 var fileError = "Error adding file " + path + "\n" + errorException.ToString().Split('\n')[0];
-                Xceed.Wpf.Toolkit.MessageBox.Show(fileError, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowDialog("Error", fileError);
                 return false;
             }
 
@@ -433,7 +435,7 @@ namespace FileToucher
         {
             if (SelectedRows.Count == 0)
             {
-                StatusBarText = "No items selected to remove.";
+                ShowDialog("Error", "There are no items selected to remove.");
                 return;
             }
 
@@ -458,7 +460,8 @@ namespace FileToucher
             var totalCleared = _selectedFiles.Count;
             if (totalCleared == 0)
             {
-                StatusBarText = "No files in list to remove.";
+                ShowDialog("Error", "No files in list to remove.");
+
                 return;
             }
 
@@ -475,7 +478,7 @@ namespace FileToucher
             // Check that an attribute to edit has actually been selected
             if (!AccessedCheck && !ModifiedCheck && !CreatedCheck)
             {
-                StatusBarText = "Please select an attribute to touch.";
+                ShowDialog("Error","Please select an attribute to touch first.");
                 return;
             }
 
@@ -500,7 +503,7 @@ namespace FileToucher
                 }
                 catch
                 {
-                    Xceed.Wpf.Toolkit.MessageBox.Show("Unable to read specified Accessed On date and time, make sure it is typed correctly", "Error Parsing Date", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ShowDialog("Error", "Unable to read specified Accessed On date and time, make sure it is typed correctly");
                     return;
                 }
             }
@@ -514,7 +517,7 @@ namespace FileToucher
                 }
                 catch
                 {
-                    Xceed.Wpf.Toolkit.MessageBox.Show("Unable to read specified Modified On date and time, make sure it is typed correctly", "Error Parsing Date", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ShowDialog("Error", "Unable to read specified Modified On date and time, make sure it is typed correctly");
                     return;
                 }
             }
@@ -528,7 +531,7 @@ namespace FileToucher
                 }
                 catch
                 {
-                    Xceed.Wpf.Toolkit.MessageBox.Show("Unable to read specified Created On date and time, make sure it is typed correctly", "Error Parsing Date", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ShowDialog("Error", "Unable to read specified Created On date and time, make sure it is typed correctly");
                     return;
                 }
             }
@@ -596,7 +599,7 @@ namespace FileToucher
 
             if (anyErrors)
             {
-                Xceed.Wpf.Toolkit.MessageBox.Show(erroredFiles, "Touch Errors", MessageBoxButton.OK, MessageBoxImage.Information);
+                ShowDialog("Error Touching Some Files", erroredFiles);
             }
 
             RefreshFileDatestamps();
@@ -692,8 +695,21 @@ namespace FileToucher
         /// </summary>
         public void ShowAbout()
         {    
-            Xceed.Wpf.Toolkit.MessageBox.Show("File Toucher 0.2 created by Duncan Tait.\nGithub repository: https://github.com/dunctait/file-toucher", "About file-toucher", MessageBoxButton.OK, MessageBoxImage.Information);
+            ShowDialog("About", "File Toucher 0.3 created by Duncan Tait.\nGithub repository: https://github.com/dunctait/file-toucher");
         }
 
+        public void ShowDialog(string title, string message)
+        {
+            DialogTitle = title;
+            DialogText = message;
+            
+            ShowDialogCommandExecute();
+
+        }
+
+        public void ShowDialogCommandExecute()
+        {
+            Messenger.Default.Send(new NotificationMessage("ShowDialog"));
+        }
     }
 }
