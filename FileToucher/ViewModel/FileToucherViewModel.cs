@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Input;
 using System.Linq;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -279,8 +281,8 @@ namespace FileToucher.ViewModel
             }
         }
 
-        // Create RelayCommand for message to show Dialog on main view
-        public RelayCommand ShowDialogCommand { private set; get; }
+        // Property to set boolean flag to stop thread operations
+        public bool StopThread { get; set; }
 
         // The following ICommands are for binding button clicks to methods
         public ICommand RemoveSelectedClicked => new RelayCommand(RemoveSelected);
@@ -315,8 +317,6 @@ namespace FileToucher.ViewModel
 
             StatusBarText = "Program started.";
 
-            ShowDialogCommand = new RelayCommand(ShowDialogCommandExecute);
-
         }
 
         /// <summary>
@@ -346,12 +346,27 @@ namespace FileToucher.ViewModel
             }
 
         }
+        
+
 
         /// <summary>
         /// Creates folder browser dialog, passes each file in folder and subfolder to AddFile()
         /// </summary>
         public void AddDirectory(string directory)
         {
+            
+            var worker = new BackgroundWorker();
+            worker.WorkerReportsProgress = true;
+            worker.DoWork += (obj, e) => AddDirectoryWorker(directory);
+            //worker.ProgressChanged += worker_ProgressChanged;
+            //worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            worker.RunWorkerAsync(10000);
+            
+        }
+
+        public void AddDirectoryWorker(string directory)
+        {
+            ShowThreadDialog("Adding Files", "Adding files now...");
 
             var successfulAdds = RecursiveFolderSearch(directory, 0);
 
@@ -367,6 +382,10 @@ namespace FileToucher.ViewModel
                     StatusBarText = successfulAdds + " files added to list.";
                     break;
             }
+
+            Application.Current.Dispatcher.BeginInvoke((Action)(() => { WorkCompletedCommandExecute(); }));
+            StopThread = false;
+
         }
 
         private int RecursiveFolderSearch(string path, int totalAddedSoFar)
@@ -375,6 +394,8 @@ namespace FileToucher.ViewModel
 
             foreach (string file in Directory.GetFiles(path))
             {
+                if (StopThread) { return 0; }
+                DialogText = "Adding " + file;
                 if (AddFile(file)) { totalAdded++; }
             }
             foreach (string subDir in Directory.GetDirectories(path))
@@ -397,14 +418,16 @@ namespace FileToucher.ViewModel
         /// <param name="path"></param>
         private bool AddFile(string path)
         {
+
             // Check if file is already in list
-            if (_selectedFiles.Any(t => path == t.Fullpath ) )
+            if (_selectedFiles.Any(t => path == t.Fullpath))
             {
                 return false;
             }
 
             try
             {
+
                 var toAdd = new TouchFiles
                 {
                     AccessedOn = File.GetLastAccessTime(path),
@@ -416,13 +439,20 @@ namespace FileToucher.ViewModel
                     Fullpath = path
                 };
 
-                _selectedFiles.Add(toAdd);
+                Application.Current.Dispatcher.Invoke((Action) (() =>
+                {
+                    _selectedFiles.Add(toAdd);
+                }));
+
                 return true;
             }
             catch (Exception errorException)
             {
                 var fileError = "Error adding file " + path + "\n" + errorException.ToString().Split('\n')[0];
-                ShowDialog("Error", fileError);
+
+
+                ShowThreadDialog("Error", fileError);
+
                 return false;
             }
 
@@ -704,12 +734,29 @@ namespace FileToucher.ViewModel
             DialogText = message;
             
             ShowDialogCommandExecute();
+        }
 
+        public void ShowThreadDialog(string title, string message)
+        {
+            DialogTitle = title;
+            DialogText = message;
+
+            Application.Current.Dispatcher.BeginInvoke((Action)(() => { ShowProgressDialogCommandExecute(); }));
         }
 
         public void ShowDialogCommandExecute()
         {
             Messenger.Default.Send(new NotificationMessage("ShowDialog"));
+        }
+
+        public void ShowProgressDialogCommandExecute()
+        {
+            Messenger.Default.Send(new NotificationMessage("ShowProgressDialog"));
+        }
+
+        public void WorkCompletedCommandExecute()
+        {
+            Messenger.Default.Send(new NotificationMessage("WorkCompleted"));
         }
     }
 }

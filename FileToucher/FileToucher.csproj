@@ -108,11 +108,18 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="View\CustomDataGrid.cs" />
+    <Compile Include="View\CustomProgressDialog.xaml.cs">
+      <DependentUpon>CustomProgressDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\CustomDialog.xaml.cs">
       <DependentUpon>CustomDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\FileToucherViewModel.cs" />
     <Compile Include="Model\TouchFiles.cs" />
+    <Page Include="View\CustomProgressDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="View\CustomDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -27,6 +28,9 @@ namespace FileToucher.View
         public static RoutedCommand SaveCommand = new RoutedCommand();
 
         private readonly FileToucherViewModel _viewModel;
+
+        private CustomDialog dialog;
+        private CustomProgressDialog progressDialog;
 
         public FileToucherView()
         {
@@ -148,7 +152,6 @@ namespace FileToucher.View
 
             // get all the directories in selected dirctory
             var directory = dialog.FileName;
-
             _viewModel.AddDirectory(directory);
         }
 
@@ -207,9 +210,21 @@ namespace FileToucher.View
         {
             if (msg.Notification == "ShowDialog")
             {
-                var newDialog = new CustomDialog {DataContext = DataContext};
-                newDialog.ShowDialog();
+                dialog = new CustomDialog {DataContext = DataContext};
+                dialog.ShowDialog();
             }
+            else if (msg.Notification == "ShowProgressDialog")
+            {
+                progressDialog = new CustomProgressDialog();
+                progressDialog.DataContext = _viewModel;
+                progressDialog.ShowDialog();
+            }
+            else if (msg.Notification == "WorkCompleted")
+            {
+                progressDialog.WorkCompleted();
+            }
+
+
         }
 
         #region MaximizeCode

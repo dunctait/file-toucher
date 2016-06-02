@@ -14,12 +14,10 @@ Version 0.3 removed any MVVM written by myself and implemented MVVM-Light as a r
 
 It is fair to say that MVVM is over-engineering for an application as small as this but the real function of this program is essentially to familiarise myself with larger scale design practices.
 
-# To do
+# Potential Development
 
 Add an "Add Directory with File Mask" function, or at least by file extension.
 
 Add language selection/datetime format selection
-
-Add progress windows (with Cancel function) and some sort of threading in case people "Add Directory -> C:/*.*" etc.
 
 Add Unit Tests
