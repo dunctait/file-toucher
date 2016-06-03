@@ -19,6 +19,7 @@ namespace FileToucher.View
     /// </summary>
     public partial class FileToucherView
     {
+        // bool to enable functionality where if window is maximized and user click-drags, window is restored to previous size
         private bool _restoreIfMove;
 
         private readonly BitmapImage _restoreButtonImage = new BitmapImage(new Uri("/FileToucher;component/Resources/RestoreButton.png", UriKind.Relative));
@@ -29,8 +30,8 @@ namespace FileToucher.View
 
         private readonly FileToucherViewModel _viewModel;
 
-        private CustomDialog dialog;
-        private CustomProgressDialog progressDialog;
+        private CustomDialog _dialog;
+        private CustomProgressDialog _progressDialog;
 
         public FileToucherView()
         {
@@ -38,6 +39,7 @@ namespace FileToucher.View
 
             Messenger.Default.Register<NotificationMessage>(this, NotificationMessageReceived);
 
+            // Create key shortcuts for file menu options
             OpenCommand.InputGestures.Add(new KeyGesture(Key.O, ModifierKeys.Control));
             SaveCommand.InputGestures.Add(new KeyGesture(Key.S, ModifierKeys.Control));
 
@@ -146,7 +148,6 @@ namespace FileToucher.View
 
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
             {
-                //MessageBox.Show("No Folder selected");
                 return;
             }
 
@@ -210,18 +211,18 @@ namespace FileToucher.View
         {
             if (msg.Notification == "ShowDialog")
             {
-                dialog = new CustomDialog {DataContext = DataContext};
-                dialog.ShowDialog();
+                _dialog = new CustomDialog {DataContext = DataContext};
+                _dialog.ShowDialog();
             }
             else if (msg.Notification == "ShowProgressDialog")
             {
-                progressDialog = new CustomProgressDialog();
-                progressDialog.DataContext = _viewModel;
-                progressDialog.ShowDialog();
+                _progressDialog = new CustomProgressDialog();
+                _progressDialog.DataContext = _viewModel;
+                _progressDialog.ShowDialog();
             }
             else if (msg.Notification == "WorkCompleted")
             {
-                progressDialog.WorkCompleted();
+                _progressDialog.WorkCompleted();
             }
 
 

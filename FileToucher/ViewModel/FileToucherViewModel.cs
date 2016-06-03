@@ -6,12 +6,11 @@ using System.Diagnostics;
 using System.Windows.Input;
 using System.Linq;
 using System.IO;
-using System.Threading;
 using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using FileToucher.Model;
 using GalaSoft.MvvmLight.Messaging;
+using FileToucher.Model;
 
 namespace FileToucher.ViewModel
 {
@@ -320,7 +319,7 @@ namespace FileToucher.ViewModel
         }
 
         /// <summary>
-        /// Creates file browser dialog, and passes selected files to AddFile() method
+        /// Receives filenames from UI and passes each file to AddFile() method
         /// </summary>
         public void AddFiles(string[] filenameStrings)
         {
@@ -347,10 +346,8 @@ namespace FileToucher.ViewModel
 
         }
         
-
-
         /// <summary>
-        /// Creates folder browser dialog, passes each file in folder and subfolder to AddFile()
+        /// Receives directory to search from UI, creates background worker to do so
         /// </summary>
         public void AddDirectory(string directory)
         {
@@ -358,12 +355,14 @@ namespace FileToucher.ViewModel
             var worker = new BackgroundWorker();
             worker.WorkerReportsProgress = true;
             worker.DoWork += (obj, e) => AddDirectoryWorker(directory);
-            //worker.ProgressChanged += worker_ProgressChanged;
-            //worker.RunWorkerCompleted += worker_RunWorkerCompleted;
             worker.RunWorkerAsync(10000);
             
         }
 
+        /// <summary>
+        /// Contains directory adding logic in a thread to stop UI locking
+        /// </summary>
+        /// <param name="directory"></param>
         public void AddDirectoryWorker(string directory)
         {
             ShowThreadDialog("Adding Files", "Adding files now...");
@@ -388,6 +387,12 @@ namespace FileToucher.ViewModel
 
         }
 
+        /// <summary>
+        /// Searches recursively through directories adding all files to list, stops if requested from UI
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="totalAddedSoFar"></param>
+        /// <returns></returns>
         private int RecursiveFolderSearch(string path, int totalAddedSoFar)
         {
             var totalAdded = totalAddedSoFar;
@@ -692,15 +697,6 @@ namespace FileToucher.ViewModel
         public void SaveFileList(string saveLocation)
         {
 
-            WriteListToFile(saveLocation);
-
-            StatusBarText = "File list saved.";
-
-        }
-
-        private void WriteListToFile(string saveLocation)
-        {
-
             string allFilesString = "";
 
             foreach (TouchFiles file in _selectedFiles)
@@ -709,6 +705,8 @@ namespace FileToucher.ViewModel
             }
 
             File.WriteAllText(saveLocation, allFilesString);
+
+            StatusBarText = "File list saved.";
 
         }
 
@@ -728,32 +726,39 @@ namespace FileToucher.ViewModel
             ShowDialog("About", "File Toucher 0.3 created by Duncan Tait.\nGithub repository: https://github.com/dunctait/file-toucher");
         }
 
+        /// <summary>
+        /// Show normal, non-thread, modal Dialog to user (with Okay button)
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="message"></param>
         public void ShowDialog(string title, string message)
         {
             DialogTitle = title;
             DialogText = message;
-            
-            ShowDialogCommandExecute();
+
+            // Send message to any connected view requesting dialog is shown
+            Messenger.Default.Send(new NotificationMessage("ShowDialog"));
         }
 
+        /// <summary>
+        /// Show progress modal dialog to user, requested from thread operations
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="message"></param>
         public void ShowThreadDialog(string title, string message)
         {
             DialogTitle = title;
             DialogText = message;
 
-            Application.Current.Dispatcher.BeginInvoke((Action)(() => { ShowProgressDialogCommandExecute(); }));
+            Application.Current.Dispatcher.BeginInvoke((Action)(() =>
+            {
+                Messenger.Default.Send(new NotificationMessage("ShowProgressDialog"));
+            }));
         }
 
-        public void ShowDialogCommandExecute()
-        {
-            Messenger.Default.Send(new NotificationMessage("ShowDialog"));
-        }
-
-        public void ShowProgressDialogCommandExecute()
-        {
-            Messenger.Default.Send(new NotificationMessage("ShowProgressDialog"));
-        }
-
+        /// <summary>
+        /// Inform the View that threaded work is completed (so progress dialog is closed)
+        /// </summary>
         public void WorkCompletedCommandExecute()
         {
             Messenger.Default.Send(new NotificationMessage("WorkCompleted"));
