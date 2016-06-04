@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
 using System.Linq;
 using System.IO;
@@ -14,6 +15,7 @@ using FileToucher.Model;
 
 namespace FileToucher.ViewModel
 {
+    [SuppressMessage("ReSharper", "RedundantNameQualifier")]
     class FileToucherViewModel : ViewModelBase
     {
         #region Variables
@@ -295,6 +297,7 @@ namespace FileToucher.ViewModel
 
         #endregion Properties
 
+
         /// <summary>
         /// FileToucherViewModel Constructor
         /// </summary>
@@ -317,6 +320,11 @@ namespace FileToucher.ViewModel
             StatusBarText = "Program started.";
 
         }
+
+        public ObservableCollection<TouchFiles> GetFileList()
+        {
+            return _selectedFiles;
+        } 
 
         /// <summary>
         /// Receives filenames from UI and passes each file to AddFile() method
@@ -382,7 +390,8 @@ namespace FileToucher.ViewModel
                     break;
             }
 
-            Application.Current.Dispatcher.BeginInvoke((Action)(() => { WorkCompletedCommandExecute(); }));
+            CheckBeginInvoke( WorkCompletedCommandExecute );
+
             StopThread = false;
 
         }
@@ -423,12 +432,19 @@ namespace FileToucher.ViewModel
         /// <param name="path"></param>
         private bool AddFile(string path)
         {
-
+            
+            // Check file exists
+            if (!File.Exists(path))
+                return false;
+            
+            // Check file is not a directory
+            FileAttributes attr = File.GetAttributes(path);
+            if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                return false;
+                
             // Check if file is already in list
             if (_selectedFiles.Any(t => path == t.Fullpath))
-            {
                 return false;
-            }
 
             try
             {
@@ -444,20 +460,20 @@ namespace FileToucher.ViewModel
                     Fullpath = path
                 };
 
-                Application.Current.Dispatcher.Invoke((Action) (() =>
+
+                CheckInvoke( () =>
                 {
                     _selectedFiles.Add(toAdd);
-                }));
+                } );
 
                 return true;
+
             }
             catch (Exception errorException)
             {
                 var fileError = "Error adding file " + path + "\n" + errorException.ToString().Split('\n')[0];
 
-
                 ShowThreadDialog("Error", fileError);
-
                 return false;
             }
 
@@ -750,10 +766,16 @@ namespace FileToucher.ViewModel
             DialogTitle = title;
             DialogText = message;
 
-            Application.Current.Dispatcher.BeginInvoke((Action)(() =>
+            if (Application.Current == null)
+            {
+                return;
+            }          
+             
+           CheckBeginInvoke( () =>
             {
                 Messenger.Default.Send(new NotificationMessage("ShowProgressDialog"));
-            }));
+            } );
+
         }
 
         /// <summary>
@@ -762,6 +784,35 @@ namespace FileToucher.ViewModel
         public void WorkCompletedCommandExecute()
         {
             Messenger.Default.Send(new NotificationMessage("WorkCompleted"));
+        }
+
+        /// <summary>
+        /// Invokes action on UI thread if UI exists (and returns), else execute normally
+        /// </summary>
+        /// <param name="action"></param>
+        public bool CheckInvoke(Action action)
+        {
+            if (Application.Current == null)
+            {
+                // execute normally
+                action.Invoke();
+                return false;
+            }
+
+            Application.Current.Dispatcher.Invoke(action);
+            return true;
+        }
+
+        /// <summary>
+        /// BeginInvokes action on UI thread if UI exists (and returns), else code isn't executed
+        /// </summary>
+        /// <param name="action"></param>
+        public bool CheckBeginInvoke(Action action)
+        {
+            if (Application.Current == null) return false;
+
+            Application.Current.Dispatcher.BeginInvoke(action);
+            return true;
         }
     }
 }

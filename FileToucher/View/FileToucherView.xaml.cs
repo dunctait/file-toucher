@@ -166,6 +166,7 @@ namespace FileToucher.View
             if (dialog.ShowDialog() != true) return;
 
             _viewModel.AddFiles(dialog.FileNames);
+
         }
 
         private void OpenClicked(object sender, RoutedEventArgs e)
