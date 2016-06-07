@@ -226,7 +226,6 @@ namespace FileToucher.View
                 _progressDialog.WorkCompleted();
             }
 
-
         }
 
         #region MaximizeCode

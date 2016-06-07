@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
 using System.Linq;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -285,6 +286,9 @@ namespace FileToucher.ViewModel
         // Property to set boolean flag to stop thread operations
         public bool StopThread { get; set; }
 
+        // Property to tell if thread is running
+        public bool ThreadRunning { get; set; }
+
         // The following ICommands are for binding button clicks to methods
         public ICommand RemoveSelectedClicked => new RelayCommand(RemoveSelected);
         public ICommand RemoveAllClicked => new RelayCommand(RemoveAll);
@@ -316,6 +320,8 @@ namespace FileToucher.ViewModel
             AccessedCheck = false;
             ModifiedCheck = true;
             CreatedCheck = false;
+
+            ThreadRunning = false;
 
             StatusBarText = "Program started.";
 
@@ -357,24 +363,19 @@ namespace FileToucher.ViewModel
         /// <summary>
         /// Receives directory to search from UI, creates background worker to do so
         /// </summary>
-        public void AddDirectory(string directory)
+        public async void AddDirectory(string directory)
         {
-            
-            var worker = new BackgroundWorker();
-            worker.WorkerReportsProgress = true;
-            worker.DoWork += (obj, e) => AddDirectoryWorker(directory);
-            worker.RunWorkerAsync(10000);
-            
+            ThreadRunning = true;
+            await Task.Run(async () => await AddDirectoryAsync(directory));
         }
 
         /// <summary>
         /// Contains directory adding logic in a thread to stop UI locking
         /// </summary>
         /// <param name="directory"></param>
-        public void AddDirectoryWorker(string directory)
+        public async Task AddDirectoryAsync(string directory)
         {
             ShowThreadDialog("Adding Files", "Adding files now...");
-
             var successfulAdds = RecursiveFolderSearch(directory, 0);
 
             switch (successfulAdds)
@@ -390,8 +391,8 @@ namespace FileToucher.ViewModel
                     break;
             }
 
+            ThreadRunning = false;
             CheckBeginInvoke( WorkCompletedCommandExecute );
-
             StopThread = false;
 
         }

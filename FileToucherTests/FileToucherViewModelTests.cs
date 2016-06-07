@@ -1,53 +1,80 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FileToucher.Model;
+﻿using System.Linq;
 using NUnit.Framework;
 using FileToucher.ViewModel;
 using System.IO;
-
+using System.Threading;
+using FileToucher.View;
 
 namespace FileToucherTests
 {
     [TestFixture]
     public class FileToucherViewModelTests
     {
-        public string GetAbsolutePath(string file)
+        private FileToucherViewModel _vm;
+
+        public string GetAbsoluteFilePath(string file)
         {
             var cd = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            var absoluteFile = cd + @"\TestFiles\" + file;
+            var absoluteFile = Path.Combine(cd, "TestFiles", file);
             return absoluteFile;
+        }
+
+        public string GetAbsoluteDirectoryPath(string subdirectoriesString)
+        {
+            var cd = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            var absoluteDirectory = cd + subdirectoriesString;
+            return absoluteDirectory;
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            _vm = new FileToucherViewModel();
         }
 
         [Test]
         public void AddFiles_FakePaths_DoesntAdd()
         {
-            var vm = new FileToucherViewModel();
-
             var files = new string[] {"X", "X:", "X:/ ", "X:/fwfw/", "C:/e/file.test", "C:/E", "", "C:/notreal.test"};
 
-            vm.AddFiles(files);
+            _vm.AddFiles(files);
 
-            Assert.That(vm.SelectedTouchFiles.Count(), Is.EqualTo(0));
+            Assert.That(_vm.SelectedTouchFiles.Count(), Is.EqualTo(0));
         }
 
         [Test]
         public void AddFiles_OneFile_Adds()
         {
-            var vm = new FileToucherViewModel();
-            
-            var files = new string[] { GetAbsolutePath("file1.txt") };
+            var files = new string[] { GetAbsoluteFilePath("file1.txt") };
 
-            vm.AddFiles(files);
-            var fileList = vm.GetFileList();
+            _vm.AddFiles(files);
+            var fileList = _vm.GetFileList();
 
             Assert.That(fileList.Count, Is.EqualTo(1));
             Assert.That(fileList[0].Filename, Is.EqualTo("file1.txt"));
             Assert.That(fileList[0].Extension, Is.EqualTo(".txt"));
+        }
+
+        [Test]
+        public void AddDirectory_TestFilesDir_Adds()
+        {
+            _vm.AddDirectory(GetAbsoluteDirectoryPath(@"\TestFiles\"));
+
+            while (_vm.ThreadRunning) { Thread.Sleep(10); }
+            var fileList = _vm.GetFileList();          
+            Assert.That(fileList.Count, Is.EqualTo(1));
+            Assert.That(fileList[0].Filename, Is.EqualTo("file1.txt"));
+            Assert.That(fileList[0].Extension, Is.EqualTo(".txt"));
+        }
+
+        [Test]
+        public void AddDirectory_OneFilePath_DoesntAdd()
+        {
+            _vm.AddDirectory(GetAbsoluteFilePath("file1.txt"));
+            
+            //while (_vm.ThreadRunning) { }
+            var fileList = _vm.GetFileList();
+            Assert.That(fileList.Count, Is.EqualTo(0));
         }
     }
 }
