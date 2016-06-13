@@ -13,6 +13,8 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using FileToucher.Model;
+using SystemWrapper;
+using SystemWrapper.IO;
 
 namespace FileToucher.ViewModel
 {
@@ -365,6 +367,11 @@ namespace FileToucher.ViewModel
         /// </summary>
         public async void AddDirectory(string directory)
         {
+            // Check file is a directory
+            FileAttributes attr = File.GetAttributes(directory);
+            if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
+                return;
+
             ThreadRunning = true;
             await Task.Run(async () => await AddDirectoryAsync(directory));
         }
@@ -483,7 +490,7 @@ namespace FileToucher.ViewModel
         /// <summary>
         /// Reads which files are selected in the UI DataGrid and removes them
         /// </summary>
-        private void RemoveSelected()
+        public void RemoveSelected()
         {
             if (SelectedRows.Count == 0)
             {
@@ -491,16 +498,19 @@ namespace FileToucher.ViewModel
                 return;
             }
 
-            var totalToRemove = 0;
+            var totalRemoved = 0;
 
-            while (SelectedRows.Count > 0)
+            var localSelectedRows = SelectedRows;
+
+            while (localSelectedRows.Count > 0)
             {
                 _selectedFiles.Remove((TouchFiles)SelectedRows[0]);
-                totalToRemove++;
+                localSelectedRows.RemoveAt(0);
+                totalRemoved++;
             }
 
             SelectedRows.Clear();
-            StatusBarText = totalToRemove + " files removed from list.";
+            StatusBarText = totalRemoved + " files removed from list.";
 
         }
 
